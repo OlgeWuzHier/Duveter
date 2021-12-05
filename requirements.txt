@@ -1,4 +1,10 @@
 python-dotenv
 Flask
 Flask-PyMongo
+flask-restful
 pymongo
+flask-jwt-extended
+flask-socketio
+flask-cors
+bcrypt
+eventlet
