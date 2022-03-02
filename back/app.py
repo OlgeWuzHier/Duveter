@@ -27,7 +27,7 @@ CORS(app)
 
 class Helloworld(Resource):
     def get(self):
-        x = mongo.db.users.find_one({"username": "dupa"})
+        x = mongo.db.users.find_one({"username": "user"})
         return json_util.dumps(x)
 
 class Login(Resource):
@@ -36,11 +36,8 @@ class Login(Resource):
         password = request.json.get("password")
 
         retrieved_user = mongo.db.users.find_one({"username": username})
-        if not retrieved_user:
-            return "User doesn't exist", 400
-        
-        if not bcrypt.checkpw(password.encode("utf-8"), retrieved_user["password"]):
-            return "Incorrect password", 401
+        if not retrieved_user or not bcrypt.checkpw(password.encode("utf-8"), retrieved_user["password"]):
+            return "Incorrect username or password", 401
 
         return {"access_token": create_access_token(identity=username)}
 
@@ -74,8 +71,8 @@ api.add_resource(Register, '/register')
 
 @socketio.on('connect')
 def connect():
-    print("dupa")
+    print("dupa123")
     emit('response', {"data": "connected"})
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     socketio.run(app)
