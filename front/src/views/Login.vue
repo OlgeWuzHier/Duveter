@@ -8,7 +8,7 @@
      <input required v-model="password" type="password" placeholder="***** ***">
      <button type="submit">Login</button>
    </form>
-   <button @click="protect"></button>
+   <button @click='protect'></button>
   </div>
 </template>
 

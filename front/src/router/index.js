@@ -1,9 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Main from '../views/Main.vue';
-
-// function isAuthenticated() {
-//   return 1;
-// }
+import isAuthenticated from '../helpers/isAuthenticated';
 
 const routes = [
   {
@@ -31,9 +28,20 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' });
-//   else next();
-// });
+// Prevent unlogged access to anything but login
+router.beforeEach((to) => {
+  if (to.name !== 'Login' && !isAuthenticated()) {
+    return { name: 'Login' };
+  }
+  return true;
+});
+
+// Prevent access to login page when logged
+router.beforeEach((to) => {
+  if (to.name === 'Login' && isAuthenticated()) {
+    return { name: 'Main' };
+  }
+  return true;
+});
 
 export default router;

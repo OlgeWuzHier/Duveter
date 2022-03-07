@@ -45,8 +45,9 @@ class Login(Resource):
 class Protected(Resource):
     @jwt_required()
     def get(self):
-        return get_jwt_identity()
-
+        # return json_util.dumps(get_jwt_identity())
+        return {}
+        
 
 class Register(Resource):
     def post(self):
@@ -64,14 +65,18 @@ class Register(Resource):
         
         return {"access_token": create_access_token(identity=username)}
 
+class Room(Resource):
+    def get(self):
+        return { 'roomId': None }
+
 api.add_resource(Helloworld, '/')
 api.add_resource(Login, '/login')
 api.add_resource(Protected, '/protected')
 api.add_resource(Register, '/register')
+api.add_resource(Room, '/room')
 
 @socketio.on('connect')
 def connect():
-    print("dupa123")
     emit('response', {"data": "connected"})
 
 if __name__ == '__main__':

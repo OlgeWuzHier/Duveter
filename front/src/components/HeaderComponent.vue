@@ -4,11 +4,33 @@
   <nav>
     <router-link class="flexitem navitem" to="/">Play</router-link>
     <router-link class="flexitem navitem" to="/leaderboard">Leaderboard</router-link>
+    <a class="flexitem navitem" v-on:click="logout" v-if="logged">Logout</a>
   </nav>
 </header>
 </template>
 
 <script>
+import isAuthenticated from '../helpers/isAuthenticated';
+
+export default {
+  data() {
+    return {
+      logged: false,
+    };
+  },
+  methods: {
+    logout() {
+      localStorage.clear();
+      this.$router.go({ name: 'Main' });
+    },
+  },
+  watch: {
+    $route() {
+      this.logged = isAuthenticated();
+    },
+  },
+};
+
 </script>
 
 <style scoped>
