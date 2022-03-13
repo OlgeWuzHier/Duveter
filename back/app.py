@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from flask_jwt_extended.utils import get_jwt_identity
 from flask_pymongo import PyMongo
-from pymongo import ReturnDocument 
+from pymongo import ReturnDocument
 # from PyMongo import MongoClient
 from flask_restful import Resource, Api
 from flask_socketio import SocketIO, send, emit
@@ -27,6 +27,7 @@ api = Api(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
 
+
 class Login(Resource):
     def post(self):
         username = request.json.get("username")
@@ -37,6 +38,7 @@ class Login(Resource):
             return "Incorrect username or password", 401
 
         return {"access_token": create_access_token(identity=username)}
+
 
 class Register(Resource):
     def post(self):
@@ -51,26 +53,38 @@ class Register(Resource):
             return "Password too short", 403
 
         mongo.db.users.insert_one({"username": username, "password": hashed})
-        
+
         return {"access_token": create_access_token(identity=username)}
+
 
 class Queue(Resource):
     @jwt_required()
     def post(self):
-        queue = mongo.db.queue.find_one_and_update(
-            {'_id': 1}, 
-            {'$push': {'players': get_jwt_identity()}},
-            return_document = ReturnDocument.AFTER)
+        username = get_jwt_identity()
+        # TODO: Check if user is already in queue
+        mongo.db.queue.insert_one({ 'username': username })
+
+        if mongo.db.queue.count_documents({}) > 1:
+            player1 = mongo.db.queue.find_one_and_delete({ 'username': username })
+            player2 = mongo.db.queue.find_one_and_delete({})
             
-        return { 'length': len(queue['players']) }
+            game = mongo.db.games.insert_one({})
+            
+            socketio.emit(f'lobby-{player1["username"]}', json_util.dumps(game.inserted_id))
+            socketio.emit(f'lobby-{player2["username"]}', json_util.dumps(game.inserted_id))
+
+        return 'OK', 200
+
 
 api.add_resource(Login, '/login')
 api.add_resource(Register, '/register')
 api.add_resource(Queue, '/queue')
 
+
 @socketio.on('connect')
 def connect():
     emit('response', {"data": "connected"})
+
 
 if __name__ == '__main__':
     socketio.run(app)

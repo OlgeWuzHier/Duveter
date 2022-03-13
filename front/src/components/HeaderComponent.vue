@@ -23,7 +23,7 @@ const router = useRouter();
 const logged = ref(false);
 const logout = () => {
   localStorage.clear();
-  router.go({ name: 'Main' });
+  router.go({ name: 'Lobby' });
 };
 watch(() => route.name, () => {
   logged.value = isAuthenticated();

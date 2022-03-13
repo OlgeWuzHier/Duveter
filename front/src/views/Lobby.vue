@@ -6,19 +6,41 @@
 
 <script setup>
 
+import { inject } from 'vue';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
+import axios from 'axios';
+import getUsername from '../helpers/getUsername';
+
+const socket = inject('socket');
+const router = useRouter();
+
 const startGame = () => {
-  // look for available rooms
-  this.$http.post('/queue')
+  // socket.removeAllListeners();
+  // Listen for socket notification about created game
+  socket.on(`lobby-${getUsername()}`, (data) => {
+    console.log(data);
+    router.go({ name: 'Game', params: { id: data.$oid } });
+  });
+  // Join queue
+  axios.post('/queue')
     .then((resp) => {
-      if (resp.data.length) {
-        // if there's one - join
-        console.log(resp.data.length);
-      } else {
-        // if there's not - create and wait for socket event
-        console.log('no room');
-      }
+      // TODO: show waiting for other player on page
+      console.log(resp);
+    })
+    .catch((error) => {
+      // TODO: show error on page
+      console.log('error', error);
     });
 };
+
+const leaveQueue = () => {
+  // TODO: Leave queue when page changed/exited
+  window.removeEventListener('beforeunload', leaveQueue);
+  socket.off(`lobby-${getUsername()}`);
+};
+
+onBeforeRouteLeave(leaveQueue);
+window.addEventListener('beforeunload', leaveQueue);
 
 </script>
 

@@ -15,7 +15,7 @@
 
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import http from '../plugins/http';
+import axios from 'axios';
 
 const router = useRouter();
 
@@ -23,7 +23,7 @@ const username = ref('');
 const password = ref('');
 
 const login = () => {
-  http.post('/login', { username: username.value, password: password.value })
+  axios.post('/login', { username: username.value, password: password.value })
     .then((resp) => {
       localStorage.setItem('accessToken', resp.data.access_token);
       router.push('/');

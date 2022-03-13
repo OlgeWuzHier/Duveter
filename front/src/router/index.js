@@ -4,21 +4,23 @@ import isAuthenticated from '../helpers/isAuthenticated';
 const routes = [
   {
     path: '/',
-    name: 'Main',
-    component: () => import('../views/Main.vue'),
+    name: 'Lobby',
+    component: () => import('../views/Lobby.vue'),
   },
   {
     path: '/leaderboard',
     name: 'Leaderboard',
-    // route level code-splitting
-    // this generates a separate chunk (leaderboard.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "leaderboard" */ '../views/Leaderboard.vue'),
+    component: () => import('../views/Leaderboard.vue'),
   },
   {
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
+  },
+  {
+    path: '/game/:id',
+    name: 'Game',
+    component: () => import('../views/Game.vue'),
   },
 ];
 
@@ -38,7 +40,7 @@ router.beforeEach((to) => {
 // Prevent access to login page when logged
 router.beforeEach((to) => {
   if (to.name === 'Login' && isAuthenticated()) {
-    return { name: 'Main' };
+    return { name: 'Lobby' };
   }
   return true;
 });
