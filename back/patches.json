@@ -1,0 +1,309 @@
+[
+  {
+    "name": "starter",
+    "arrangement_table": [[1, 1]],
+    "price_coins": 2,
+    "price_time": 1,
+    "income_value": 0
+  },
+  {
+    "name": "straight_small",
+    "arrangement_table": [[1, 1, 1]],
+    "price_coins": 2,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "straight_medium",
+    "arrangement_table": [[1, 1, 1, 1]],
+    "price_coins": 3,
+    "price_time": 3,
+    "income_value": 1
+  },
+  {
+    "name": "straight_big",
+    "arrangement_table": [[1, 1, 1, 1, 1]],
+    "price_coins": 7,
+    "price_time": 1,
+    "income_value": 1
+  },
+  {
+    "name": "elongated_cross",
+    "arrangement_table": [[0, 0, 1, 0, 0],
+                          [1, 1, 1, 1, 1],
+                          [0, 0, 1, 0, 0]],
+    "price_coins": 1,
+    "price_time": 4,
+    "income_value": 1
+  },
+  {
+    "name": "skewed_cross",
+    "arrangement_table": [[0, 1, 0, 0, 0],
+                          [1, 1, 1, 1, 1],
+                          [0, 0, 0, 1, 0]],
+    "price_coins": 2,
+    "price_time": 1,
+    "income_value": 0
+  },
+  {
+    "name": "regular_cross",
+    "arrangement_table": [[0, 1, 0, 0, 0],
+                          [1, 1, 1, 1, 1],
+                          [0, 1, 0, 0, 0]],
+    "price_coins": 0,
+    "price_time": 3,
+    "income_value": 1
+  },
+  {
+    "name": "small_cross",
+    "arrangement_table": [[0, 1, 0],
+                          [1, 1, 1],
+                          [0, 1, 0]], 
+    "price_coins": 5, 
+    "price_time": 4,
+    "income_value": 2
+  },
+  {
+    "name": "zee",
+    "arrangement_table": [[0, 0, 0, 0, 1],
+                          [1, 1, 1, 1, 1],
+                          [1, 0, 0, 0, 0]],
+    "price_coins": 1,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "small_zee_1",
+    "arrangement_table": [[1, 1, 0],
+                          [0, 1, 1]],
+    "price_coins": 3,
+    "price_time": 2,
+    "income_value": 1
+  },
+  {
+    "name": "small_zee_2",
+    "arrangement_table": [[1, 1, 0],
+                          [0, 1, 1]],
+    "price_coins": 7,
+    "price_time": 6,
+    "income_value": 3
+  },
+  {
+    "name": "skewed_zee",
+    "arrangement_table": [[1, 1, 0, 0],
+                          [0, 1, 1, 1]],
+    "price_coins": 2,
+    "price_time": 3,
+    "income_value": 1
+  },
+  {
+    "name": "regular_cross_half",
+    "arrangement_table": [[0, 1, 0, 0],
+                          [1, 1, 1, 1]],
+    "price_coins": 3,
+    "price_time": 4,
+    "income_value": 1
+  },
+  {
+    "name": "small_cross_half",
+    "arrangement_table": [[0, 1, 0],
+                          [1, 1, 1]],
+    "price_coins": 2,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "big_tee",
+    "arrangement_table": [[1, 0, 0, 0],
+                          [1, 1, 1, 1],
+                          [1, 0, 0, 0]],
+    "price_coins": 7,
+    "price_time": 2,
+    "income_value": 2
+  },
+  {
+    "name": "small_tee",
+    "arrangement_table": [[1, 0, 0],
+                          [1, 1, 1],
+                          [1, 0, 0]],
+    "price_coins": 5,
+    "price_time": 5,
+    "income_value": 2
+  },
+  {
+    "name": "el_big",
+    "arrangement_table": [[1, 0, 0, 0],
+                          [1, 1, 1, 1]],
+    "price_coins": 10,
+    "price_time": 3,
+    "income_value": 2
+  },
+  {
+    "name": "el_medium_1",
+    "arrangement_table": [[1, 0, 0],
+                          [1, 1, 1]],
+    "price_coins": 4,
+    "price_time": 2,
+    "income_value": 1
+  },
+  {
+    "name": "el_medium_2",
+    "arrangement_table": [[1, 0, 0],
+                          [1, 1, 1]],
+    "price_coins": 4,
+    "price_time": 6,
+    "income_value": 2
+  },
+  {
+    "name": "el_small_1",
+    "arrangement_table": [[1, 0],
+                          [1, 1]],
+    "price_coins": 1,
+    "price_time": 3,
+    "income_value": 0
+  },
+  {
+    "name": "el_small_2",
+    "arrangement_table": [[1, 0],
+                          [1, 1]],
+    "price_coins": 3,
+    "price_time": 1,
+    "income_value": 0
+  },
+  {
+    "name": "square",
+    "arrangement_table": [[1, 1],
+                          [1, 1]],
+    "price_coins": 6,
+    "price_time": 5,
+    "income_value": 2
+  },
+  {
+    "name": "square_appendix",
+    "arrangement_table": [[1, 1, 1],
+                          [1, 1, 0]],
+    "price_coins": 2,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "square_appendix_long",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "square_appendix_curved",
+    "arrangement_table": [[1, 1, 0],
+                          [1, 1, 1],
+                          [0, 0, 1]],
+    "price_coins": 8,
+    "price_time": 6,
+    "income_value": 3
+  },
+  {
+    "name": "rectangle_appendixes",
+    "arrangement_table": [[0, 1, 1, 0],
+                          [1, 1, 1, 1],
+                          [0, 1, 1, 0]],
+    "price_coins": 5,
+    "price_time": 3,
+    "income_value": 1
+  },
+  {
+    "name": "hat",
+    "arrangement_table": [[0, 1, 1, 0],
+                          [1, 1, 1, 1]],
+    "price_coins": 7,
+    "price_time": 4,
+    "income_value": 2
+  },
+  {
+    "name": "zee_fat",
+    "arrangement_table": [[1, 1, 1, 0],
+                          [0, 1, 1, 1]],
+    "price_coins": 4,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "cee_small",
+    "arrangement_table": [[1, 0, 1],
+                          [1, 1, 1]],
+    "price_coins": 1,
+    "price_time": 2,
+    "income_value": 0
+  },
+  {
+    "name": "cee_big",
+    "arrangement_table": [[1, 0, 0, 1],
+                          [1, 1, 1, 1]],
+    "price_coins": 1,
+    "price_time": 5,
+    "income_value": 1
+  },
+  {
+    "name": "hehe",
+    "arrangement_table": [[1, 0, 1],
+                          [1, 1, 1],
+                          [1, 0, 1]],
+    "price_coins": 2,
+    "price_time": 3,
+    "income_value": 0
+  },
+  {
+    "name": "tetris",
+    "arrangement_table": [[1, 0, 0],
+                          [1, 1, 0],
+                          [0, 1, 1]],
+    "price_coins": 10,
+    "price_time": 4,
+    "income_value": 3
+  },
+  {
+    "name": "space_battleship",
+    "arrangement_table": [[0, 1, 0],
+                          [1, 1, 1],
+                          [1, 0, 1]],
+    "price_coins": 3,
+    "price_time": 6,
+    "income_value": 2
+  },
+  {
+    "name": "special_1",
+    "arrangement_table": [[1]],
+    "price_coins": 0,
+    "price_time": 0,
+    "income_value": 0
+  },
+  {
+    "name": "special_2",
+    "arrangement_table": [[1]],
+    "price_coins": 0,
+    "price_time": 0,
+    "income_value": 0
+  },
+  {
+    "name": "special_3",
+    "arrangement_table": [[1]],
+    "price_coins": 0,
+    "price_time": 0,
+    "income_value": 0
+  },
+  {
+    "name": "special_4",
+    "arrangement_table": [[1]],
+    "price_coins": 0,
+    "price_time": 0,
+    "income_value": 0
+  },
+  {
+    "name": "special_5",
+    "arrangement_table": [[1]],
+    "price_coins": 0,
+    "price_time": 0,
+    "income_value": 0
+  }
+]
