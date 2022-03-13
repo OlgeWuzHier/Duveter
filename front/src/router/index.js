@@ -1,12 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import Main from '../views/Main.vue';
 import isAuthenticated from '../helpers/isAuthenticated';
 
 const routes = [
   {
     path: '/',
     name: 'Main',
-    component: Main,
+    component: () => import('../views/Main.vue'),
   },
   {
     path: '/leaderboard',

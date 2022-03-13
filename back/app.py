@@ -2,7 +2,8 @@ import re
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_jwt_extended.utils import get_jwt_identity
-from flask_pymongo import PyMongo 
+from flask_pymongo import PyMongo
+from pymongo import ReturnDocument 
 # from PyMongo import MongoClient
 from flask_restful import Resource, Api
 from flask_socketio import SocketIO, send, emit
@@ -17,6 +18,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = os.getenv("CONNECTION_STRING")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False  # TODO Change later
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["SECRET_KEY"] = os.getenv("SOCKET_SECRET_KEY")
 jwt = JWTManager(app)
@@ -24,11 +26,6 @@ mongo = PyMongo(app)
 api = Api(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
-
-class Helloworld(Resource):
-    def get(self):
-        x = mongo.db.users.find_one({"username": "user"})
-        return json_util.dumps(x)
 
 class Login(Resource):
     def post(self):
@@ -40,14 +37,6 @@ class Login(Resource):
             return "Incorrect username or password", 401
 
         return {"access_token": create_access_token(identity=username)}
-
-
-class Protected(Resource):
-    @jwt_required()
-    def get(self):
-        # return json_util.dumps(get_jwt_identity())
-        return {}
-        
 
 class Register(Resource):
     def post(self):
@@ -65,15 +54,19 @@ class Register(Resource):
         
         return {"access_token": create_access_token(identity=username)}
 
-class Room(Resource):
-    def get(self):
-        return { 'roomId': None }
+class Queue(Resource):
+    @jwt_required()
+    def post(self):
+        queue = mongo.db.queue.find_one_and_update(
+            {'_id': 1}, 
+            {'$push': {'players': get_jwt_identity()}},
+            return_document = ReturnDocument.AFTER)
+            
+        return { 'length': len(queue['players']) }
 
-api.add_resource(Helloworld, '/')
 api.add_resource(Login, '/login')
-api.add_resource(Protected, '/protected')
 api.add_resource(Register, '/register')
-api.add_resource(Room, '/room')
+api.add_resource(Queue, '/queue')
 
 @socketio.on('connect')
 def connect():

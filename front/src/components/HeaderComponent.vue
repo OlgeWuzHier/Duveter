@@ -1,6 +1,8 @@
 <template>
 <header>
+  <router-link class="flexitem navitem" to="/">
   <img src="@/assets/duveter_logo.png" height="80" alt="Duveter" loading="lazy" class="flexitem"/>
+  </router-link>
   <nav>
     <router-link class="flexitem navitem" to="/">Play</router-link>
     <router-link class="flexitem navitem" to="/leaderboard">Leaderboard</router-link>
@@ -9,27 +11,23 @@
 </header>
 </template>
 
-<script>
+<script setup>
+
+import { ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import isAuthenticated from '../helpers/isAuthenticated';
 
-export default {
-  data() {
-    return {
-      logged: false,
-    };
-  },
-  methods: {
-    logout() {
-      localStorage.clear();
-      this.$router.go({ name: 'Main' });
-    },
-  },
-  watch: {
-    $route() {
-      this.logged = isAuthenticated();
-    },
-  },
+const route = useRoute();
+const router = useRouter();
+
+const logged = ref(false);
+const logout = () => {
+  localStorage.clear();
+  router.go({ name: 'Main' });
 };
+watch(() => route.name, () => {
+  logged.value = isAuthenticated();
+});
 
 </script>
 
