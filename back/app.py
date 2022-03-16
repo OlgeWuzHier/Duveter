@@ -1,18 +1,19 @@
+import json
 import re
 from dotenv import load_dotenv
 from flask import Flask, request
 from flask_jwt_extended.utils import get_jwt_identity
 from flask_pymongo import PyMongo
-from pymongo import ReturnDocument
 # from PyMongo import MongoClient
 from flask_restful import Resource, Api
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
 import os
 from bson import json_util
+from bson.objectid import ObjectId
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import bcrypt
-
+import random
 
 load_dotenv()
 
@@ -68,17 +69,54 @@ class Queue(Resource):
             player1 = mongo.db.queue.find_one_and_delete({ 'username': username })
             player2 = mongo.db.queue.find_one_and_delete({})
             
-            game = mongo.db.games.insert_one({})
+            with open("patches.json", 'r') as j:
+                patches = json.loads(j.read())
+                random.shuffle(patches)
+                starter_index = patches.index(next(p for p in patches if p['name'] == "starter"))
+                patches.append(patches.pop(starter_index))
+                game = mongo.db.games.insert_one({
+                    "patchesList": patches,
+                    "coinFields": [0, 6, 12, 18, 24, 30, 36, 42, 48],
+                    "bonusPatchFields": [3, 9, 15, 21, 27], 
+                    "players": [
+                        {
+                            "username": player1["username"],
+                            "score": 0,
+                            "patches": [],
+                            "coins": 5,
+                            "timeLeft": 53,
+                        },
+                        { 
+                            "username": player2["username"],
+                            "score": 0,
+                            "patches": [],
+                            "coins": 5,
+                            "timeLeft": 53,
+                        },
+                    ],
+                    "lastPlayer": player1["username"],
+                })
             
             socketio.emit(f'lobby-{player1["username"]}', json_util.dumps(game.inserted_id))
             socketio.emit(f'lobby-{player2["username"]}', json_util.dumps(game.inserted_id))
 
         return 'OK', 200
 
+class Game(Resource):
+    @jwt_required()
+    def get(self):
+        if not request.args.get("id"):
+            return 'Bad request', 400
+        game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
+        return { "game": json.loads(json_util.dumps(game)) }
+
+
+
 
 api.add_resource(Login, '/login')
 api.add_resource(Register, '/register')
 api.add_resource(Queue, '/queue')
+api.add_resource(Game, '/game')
 
 
 @socketio.on('connect')

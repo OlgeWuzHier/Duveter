@@ -1,13 +1,13 @@
 <template>
-<header>
-  <router-link class="flexitem navitem" to="/">
-  <img src="@/assets/duveter_logo.png" height="80" alt="Duveter" loading="lazy" class="flexitem"/>
-  </router-link>
-  <nav>
-    <router-link class="flexitem navitem" to="/">Play</router-link>
-    <router-link class="flexitem navitem" to="/leaderboard">Leaderboard</router-link>
-    <a class="flexitem navitem" v-on:click="logout" v-if="logged">Logout</a>
-  </nav>
+  <header>
+    <router-link class="flexitem" to="/">
+      <img src="@/assets/duveter_logo.png" alt="Duveter" loading="lazy"/>
+    </router-link>
+    <nav class="flexitem">
+      <router-link class="navitem" to="/">Play</router-link>
+      <router-link class="navitem" to="/leaderboard">Leaderboard</router-link>
+      <a class="navitem" v-on:click="logout" v-if="logged">Logout</a>
+    </nav>
 </header>
 </template>
 
@@ -22,8 +22,8 @@ const router = useRouter();
 
 const logged = ref(false);
 const logout = () => {
+  router.push({ name: 'Login' });
   localStorage.clear();
-  router.go({ name: 'Lobby' });
 };
 watch(() => route.name, () => {
   logged.value = isAuthenticated();
@@ -32,12 +32,11 @@ watch(() => route.name, () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
 header {
   width: 100%;
-  position: sticky;
-  top: 0;
+  height: 80px;
+  order: -1;
+
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -50,22 +49,21 @@ nav {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
 .flexitem {
-  padding-left: 10px;
-  padding-right: 10px;
   flex-basis: 30%;
 }
 
 .navitem {
-  font-family: 'Patrick Hand';
+  padding-inline: 15px;
+  line-height: 80px;
   font-size: 1.5em;
-  font-weight: 100;
   color: rgb(155, 201, 255);
+  flex-basis: 33%;
 }
 
 .navitem:hover {
@@ -73,7 +71,7 @@ nav {
 }
 
 img {
-  width: 100%;
+  height: 80px;
   object-fit: contain;
 }
 </style>

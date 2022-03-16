@@ -13,13 +13,14 @@ import getUsername from '../helpers/getUsername';
 
 const socket = inject('socket');
 const router = useRouter();
+const username = getUsername();
 
 const startGame = () => {
   // socket.removeAllListeners();
   // Listen for socket notification about created game
-  socket.on(`lobby-${getUsername()}`, (data) => {
-    console.log(data);
-    router.go({ name: 'Game', params: { id: data.$oid } });
+  socket.on(`lobby-${username}`, (data) => {
+    const id = JSON.parse(data).$oid;
+    router.push({ name: 'Game', params: { id } });
   });
   // Join queue
   axios.post('/queue')
@@ -36,7 +37,7 @@ const startGame = () => {
 const leaveQueue = () => {
   // TODO: Leave queue when page changed/exited
   window.removeEventListener('beforeunload', leaveQueue);
-  socket.off(`lobby-${getUsername()}`);
+  socket.off(`lobby-${username}`);
 };
 
 onBeforeRouteLeave(leaveQueue);
@@ -45,12 +46,7 @@ window.addEventListener('beforeunload', leaveQueue);
 </script>
 
 <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
-  .main {
-    font-family: 'Patrick Hand';
-  }
-
-  button {
+button {
   margin-top: 5vh;
   position: relative;
   overflow: hidden;
