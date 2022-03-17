@@ -50,7 +50,6 @@ button {
   margin-top: 5vh;
   position: relative;
   overflow: hidden;
-  -webkit-transition: background 400ms;
   transition: background 400ms;
   color: #fff;
   background-color: #6ab04c;
@@ -63,14 +62,12 @@ button {
   outline: 0;
   border: 0;
   border-radius: 0.25rem;
-  -webkit-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
 
 .ripple {
   background-position: center;
-  -webkit-transition: background 0.8s;
   transition: background 0.8s;
 }
 .ripple:hover {
@@ -79,7 +76,6 @@ button {
 .ripple:active {
   background-color: #badc58;
   background-size: 100%;
-  -webkit-transition: background 0s;
   transition: background 0s;
 }
 </style>

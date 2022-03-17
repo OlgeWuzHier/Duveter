@@ -15,8 +15,6 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 
 #app {
   font-family: 'Patrick Hand', Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
 }

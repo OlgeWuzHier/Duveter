@@ -1,14 +1,19 @@
 <template>
   <div v-if="game">
     <div class='element available'>
-      <PatchComponent
+      <AvailablePatchComponent
       v-for="patch in availablePatches()"
       :key="patch.name"
       :id="patch.name"
-      :patch="patch"/>
+      :patch="patch"
+      :draggable="true"
+      @rotate="rotatePatch"
+      @flipHorizontal="flipPatchHorizontally"
+      @flipVertical="flipPatchVertically"
+      />
     </div>
     <div class='element player'>
-      <BoardComponent :player="game.players[0]"/>
+      <BoardComponent :player="game.players[0]" @boardLoaded="boardLoaded"/>
     </div>
     <div class='element opponent'>
       <BoardComponent :player="game.players[1]" />
@@ -23,7 +28,8 @@
         v-for="patch in comingupPatches()"
         :key="patch.name"
         :id="patch.name"
-        :patch="patch"/>
+        :patch="patch"
+        :draggable="false"/>
       </div>
     </div>
   </div>
@@ -32,6 +38,8 @@
 <script setup>
 
 // import { inject } from 'vue';
+import interact from 'interactjs';
+import AvailablePatchComponent from '@/components/AvailablePatchComponent.vue';
 import PatchComponent from '@/components/PatchComponent.vue';
 import BoardComponent from '@/components/BoardComponent.vue';
 import axios from 'axios';
@@ -41,7 +49,6 @@ import { ref } from 'vue';
 // const socket = inject('socket');
 const route = useRoute();
 const game = ref();
-window.game = game;
 
 axios.get(`/game?id=${route.params.id}`)
   .then((resp) => {
@@ -50,6 +57,73 @@ axios.get(`/game?id=${route.params.id}`)
 
 const availablePatches = () => game.value.patchesList.slice(0, 3);
 const comingupPatches = () => game.value.patchesList.slice(3);
+
+const rotatePatch = (name) => {
+  const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  const rotate = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
+  patch.arrangement_table = rotate(patch.arrangement_table);
+};
+
+const flipPatchHorizontally = (name) => {
+  const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  console.log(patch);
+};
+
+const flipPatchVertically = (name) => {
+  const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  console.log(patch);
+};
+
+const createGrid = () => [
+  ...document.querySelectorAll('.player .board>div')]
+  .map((d) => ({
+    x: d.getBoundingClientRect().left,
+    y: d.getBoundingClientRect().top,
+  }));
+
+const getModifiers = () => [
+  interact.modifiers.restrictRect({
+    restriction: '.body-elem',
+  }),
+  interact.modifiers.snap({
+    targets: createGrid(),
+    relativePoints: [{ x: 0, y: 0 }],
+    range: 100,
+  }),
+];
+
+const boardLoaded = () => {
+  interact('.draggable')
+    .draggable({
+      inertia: false,
+      modifiers: getModifiers(),
+      autoScroll: true,
+      listeners: {
+        move(event) {
+          event.interactable.draggable({ modifiers: getModifiers() });
+          const { target } = event;
+          const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+          const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+          target.style.transform = `translate(${x}px, ${y}px)  translateX(-50%)`;
+
+          target.setAttribute('data-x', x);
+          target.setAttribute('data-y', y);
+        },
+        end(event) {
+          console.log(`moved a distance of ${
+            (Math.sqrt((event.pageX - event.x0) ** 2 + (event.pageY - event.y0) ** 2)).toFixed(2)}px`);
+        },
+      },
+    });
+
+  interact('.player .board>div')
+    .dropzone({
+      ondrop(event) {
+        console.log(`${event.relatedTarget.id} was dropped into ${event.target.id}`);
+      },
+    });
+};
 </script>
 
 <style scoped>
@@ -57,7 +131,6 @@ const comingupPatches = () => game.value.patchesList.slice(3);
   .body-elem {
     font-family: 'Patrick Hand';
     flex-grow: 1;
-
     display: grid;
     grid-template-columns: 1fr 2fr 2fr;
     grid-template-rows: 11fr 1fr 2fr;
@@ -71,37 +144,45 @@ const comingupPatches = () => game.value.patchesList.slice(3);
     align-content: stretch;
     overflow: hidden;
     color: white;
+    background: url(../assets/bg.jpg);
+    background-size: cover;
   }
 
   .element {
-    background-color: rgb(255, 239, 149);
-    overflow: auto;
+    border: 1px solid black;
+    box-sizing: border-box;
   }
 
   .available {
     grid-area: available;
-    background-color: pink;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
   }
 
   .player {
     grid-area: player;
-    background-color: blue;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
   }
 
   .opponent {
     grid-area: opponent;
-    background-color: rebeccapurple;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .time {
     grid-area: time;
-    background-color: goldenrod;
     display: flex;
   }
 
   .timeUnit {
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     border: 1px solid blue;
     background-color: gray;
@@ -109,7 +190,8 @@ const comingupPatches = () => game.value.patchesList.slice(3);
 
   .comingup {
     grid-area: comingup;
-    background-color: green;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .patches-container {
@@ -136,7 +218,6 @@ const comingupPatches = () => game.value.patchesList.slice(3);
     margin-top: 5vh;
     position: relative;
     overflow: hidden;
-    -webkit-transition: background 400ms;
     transition: background 400ms;
     color: #fff;
     background-color: #6ab04c;
@@ -149,14 +230,12 @@ const comingupPatches = () => game.value.patchesList.slice(3);
     outline: 0;
     border: 0;
     border-radius: 0.25rem;
-    -webkit-box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
     cursor: pointer;
   }
 
   .ripple {
     background-position: center;
-    -webkit-transition: background 0.8s;
     transition: background 0.8s;
   }
   .ripple:hover {
@@ -165,7 +244,6 @@ const comingupPatches = () => game.value.patchesList.slice(3);
   .ripple:active {
     background-color: #badc58;
     background-size: 100%;
-    -webkit-transition: background 0s;
     transition: background 0s;
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <header>
     <router-link class="flexitem" to="/">
-      <img src="@/assets/duveter_logo.png" alt="Duveter" loading="lazy"/>
+      <img src="@/assets/logo.png" alt="Duveter" loading="lazy"/>
     </router-link>
     <nav class="flexitem">
       <router-link class="navitem" to="/">Play</router-link>
@@ -59,7 +59,6 @@ nav {
 }
 
 .navitem {
-  padding-inline: 15px;
   line-height: 80px;
   font-size: 1.5em;
   color: rgb(155, 201, 255);

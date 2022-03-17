@@ -13,7 +13,7 @@
 import TileComponent from '@/components/TileComponent.vue';
 import { toRefs, defineProps } from 'vue';
 
-const props = defineProps(['patch']);
+const props = defineProps(['patch', 'draggable', 'patternPath']);
 const patch = toRefs(props.patch);
 const cols = patch.arrangement_table.value.length;
 const rows = patch.arrangement_table.value[0].length;
@@ -21,14 +21,17 @@ const rows = patch.arrangement_table.value[0].length;
 const style = {
   // width: `${12 * patch.arrangement_table.value.length}px`,
   // height: `${12 * patch.arrangement_table.value[0].length}px`,
-  'grid-template-columns': `repeat(${rows}, 4vh)`,
-  'grid-template-rows': `repeat(${cols}, 4vh)`,
+  'grid-template-columns': `repeat(${rows}, 3.5vw)`,
+  'grid-template-rows': `repeat(${cols}, 3.5vw)`,
+  position: props.draggable ? 'absolute' : 'static',
+  // margin: props.draggable ? '0px' : '10px',
 };
 
 </script>
 
 <style scoped>
 .wrapper {
+  position: absolute;
   display: grid;
   justify-content: stretch;
   align-content: stretch;

@@ -9,8 +9,12 @@
     "start": "vue-cli-service serve --open"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.0",
+    "@fortawesome/free-solid-svg-icons": "^6.1.0",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "interactjs": "^1.10.11",
     "jwt-decode": "^3.1.2",
     "mdb-vue-ui-kit": "^1.7.0",
     "socket.io-client": "^4.4.1",
