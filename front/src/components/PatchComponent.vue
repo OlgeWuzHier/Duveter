@@ -2,29 +2,36 @@
   <div class='wrapper' :style="style">
     <TileComponent
       v-for="(elem, index) in patch.arrangement_table.value.flat()"
-      :key="elem"
+      :key="index"
       :visible="elem"
       :xIndex="index % rows"
-      :yIndex="Math.floor(index / rows)" />
+      :yIndex="Math.floor(index / rows)"
+      @identifyTile='identifyTile' />
   </div>
 </template>
 
 <script setup>
 import TileComponent from '@/components/TileComponent.vue';
-import { toRefs, defineProps } from 'vue';
+import {
+  toRefs, defineProps, defineEmits, computed,
+} from 'vue';
 
 const props = defineProps(['patch', 'draggable', 'patternPath']);
+const emit = defineEmits(['identifyTile']);
 const patch = toRefs(props.patch);
-const cols = patch.arrangement_table.value.length;
-const rows = patch.arrangement_table.value[0].length;
+const rows = computed(() => patch.arrangement_table.value[0].length);
 
-const style = {
+const style = computed(() => ({
   // width: `${12 * patch.arrangement_table.value.length}px`,
   // height: `${12 * patch.arrangement_table.value[0].length}px`,
-  'grid-template-columns': `repeat(${rows}, 3.5vw)`,
-  'grid-template-rows': `repeat(${cols}, 3.5vw)`,
+  'grid-template-columns': `repeat(${patch.arrangement_table.value[0].length}, 3.5vw)`,
+  'grid-template-rows': `repeat(${patch.arrangement_table.value.length}, 3.5vw)`,
   position: props.draggable ? 'absolute' : 'static',
   // margin: props.draggable ? '0px' : '10px',
+}));
+
+const identifyTile = (obj) => {
+  emit('identifyTile', obj);
 };
 
 </script>

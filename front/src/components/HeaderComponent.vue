@@ -4,9 +4,19 @@
       <img src="@/assets/logo.png" alt="Duveter" loading="lazy"/>
     </router-link>
     <nav class="flexitem">
-      <router-link class="navitem" to="/">Play</router-link>
-      <router-link class="navitem" to="/leaderboard">Leaderboard</router-link>
-      <a class="navitem" v-on:click="logout" v-if="logged">Logout</a>
+      <div class="navitem">
+        <font-awesome-icon :icon="['fas', 'moon']" />
+      </div>
+      <router-link class="navitem" to="/">
+        <font-awesome-icon :icon="['fas', 'play']" style="padding-right: 10px;"/>
+        Play</router-link>
+      <router-link class="navitem" to="/leaderboard">
+        <font-awesome-icon :icon="['fas', 'clipboard-list']" style="padding-right: 10px;"/>
+        Leaderboard</router-link>
+      <a class="navitem" v-on:click="logout" v-if="logged">
+        <font-awesome-icon :icon="['fas', 'power-off']" style="padding-right: 10px;"/>
+        Logout
+      </a>
     </nav>
 </header>
 </template>
@@ -15,7 +25,13 @@
 
 import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faMoon, faPlay, faClipboardList, faPowerOff,
+} from '@fortawesome/free-solid-svg-icons';
 import isAuthenticated from '../helpers/isAuthenticated';
+
+library.add(faMoon, faPlay, faClipboardList, faPowerOff);
 
 const route = useRoute();
 const router = useRouter();
@@ -62,7 +78,7 @@ nav {
   line-height: 80px;
   font-size: 1.5em;
   color: rgb(155, 201, 255);
-  flex-basis: 33%;
+  flex-grow: 1;
 }
 
 .navitem:hover {

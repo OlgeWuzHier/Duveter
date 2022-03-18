@@ -10,6 +10,7 @@
       @rotate="rotatePatch"
       @flipHorizontal="flipPatchHorizontally"
       @flipVertical="flipPatchVertically"
+      @identifyTile="saveTilePosition"
       />
     </div>
     <div class='element player'>
@@ -19,8 +20,8 @@
       <BoardComponent :player="game.players[1]" />
     </div>
     <div class='element time'>
-      <div class='timeUnit' v-for="timeunit in Array(game.players[0].timeLeft).fill(1)"
-      :key="timeunit"></div>
+      <div class='timeUnit' v-for="(timeunit, index) in Array(game.players[0].timeLeft).fill(1)"
+      :key="index"></div>
     </div>
     <div class='element comingup'>
       <div class='patches-container'>
@@ -49,6 +50,8 @@ import { ref } from 'vue';
 // const socket = inject('socket');
 const route = useRoute();
 const game = ref();
+let tilePosition = null;
+let positionValid = false;
 
 axios.get(`/game?id=${route.params.id}`)
   .then((resp) => {
@@ -58,20 +61,26 @@ axios.get(`/game?id=${route.params.id}`)
 const availablePatches = () => game.value.patchesList.slice(0, 3);
 const comingupPatches = () => game.value.patchesList.slice(3);
 
+const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
+const flipArray = (m) => m.map((row) => row.reverse());
+
 const rotatePatch = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
-  const rotate = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
-  patch.arrangement_table = rotate(patch.arrangement_table);
+  patch.arrangement_table = rotateArray(patch.arrangement_table);
 };
 
 const flipPatchHorizontally = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
-  console.log(patch);
+  patch.arrangement_table = flipArray(patch.arrangement_table);
 };
 
 const flipPatchVertically = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
-  console.log(patch);
+  patch.arrangement_table = rotateArray(rotateArray(flipArray(patch.arrangement_table)));
+};
+
+const saveTilePosition = (obj) => {
+  tilePosition = obj;
 };
 
 const createGrid = () => [
@@ -88,24 +97,29 @@ const getModifiers = () => [
   interact.modifiers.snap({
     targets: createGrid(),
     relativePoints: [{ x: 0, y: 0 }],
-    range: 100,
+    range: 50,
   }),
 ];
 
 const boardLoaded = () => {
+  window.availablePatches = availablePatches();
+
   interact('.draggable')
     .draggable({
       inertia: false,
       modifiers: getModifiers(),
       autoScroll: true,
       listeners: {
+        start() {
+          positionValid = false;
+        },
         move(event) {
           event.interactable.draggable({ modifiers: getModifiers() });
           const { target } = event;
           const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
           const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-          target.style.transform = `translate(${x}px, ${y}px)  translateX(-50%)`;
+          target.style.transform = `translate(${x}px, ${y}px) translateX(-50%)`;
 
           target.setAttribute('data-x', x);
           target.setAttribute('data-y', y);
@@ -113,6 +127,12 @@ const boardLoaded = () => {
         end(event) {
           console.log(`moved a distance of ${
             (Math.sqrt((event.pageX - event.x0) ** 2 + (event.pageY - event.y0) ** 2)).toFixed(2)}px`);
+          const { target } = event;
+          if (!positionValid) {
+            target.style.transform = 'translate(0px, 0px) translateX(-50%)';
+            target.setAttribute('data-x', 0);
+            target.setAttribute('data-y', 0);
+          }
         },
       },
     });
@@ -120,7 +140,22 @@ const boardLoaded = () => {
   interact('.player .board>div')
     .dropzone({
       ondrop(event) {
-        console.log(`${event.relatedTarget.id} was dropped into ${event.target.id}`);
+        // console.log(event.target);
+        // window.target = event.target;
+        console.log(`${event.relatedTarget.id} was dropped into 
+          x: ${event.target.dataset.x}, 
+          y: ${event.target.dataset.y}`);
+
+        const patch = game.value.patchesList.filter((p) => p.name === event.relatedTarget.id)[0];
+        const width = patch.arrangement_table[0].length;
+        const height = patch.arrangement_table.length;
+        positionValid = true;
+        console.log(event.target.dataset.x, tilePosition.x, width);
+        console.log(event.target.dataset.y, tilePosition.y, height);
+        if (event.target.dataset.x - tilePosition.x + width > 9
+          || event.target.dataset.y - tilePosition.y + height > 9) {
+          positionValid = false;
+        }
       },
     });
 };
@@ -144,8 +179,6 @@ const boardLoaded = () => {
     align-content: stretch;
     overflow: hidden;
     color: white;
-    background: url(../assets/bg.jpg);
-    background-size: cover;
   }
 
   .element {

@@ -11,8 +11,10 @@
     </button>
     <PatchComponent
       :patch="props.patch"
+      :id="props.patch.name"
       :draggable="true"
-      class="draggable"/>
+      class="draggable"
+      @identifyTile='identifyTile'/>
   </div>
 </template>
 
@@ -25,7 +27,7 @@ import { faRotateRight, faUpDown } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faRotateRight, faUpDown);
 const props = defineProps(['patch', 'draggable', 'patternPath']);
-const emit = defineEmits(['rotate', 'flipHorizontal', 'flipVertical']);
+const emit = defineEmits(['rotate', 'flipHorizontal', 'flipVertical', 'identifyTile']);
 const patch = toRefs(props.patch);
 
 // const cols = patch.arrangement_table.value.length;
@@ -34,7 +36,9 @@ const patch = toRefs(props.patch);
 const rotate = () => emit('rotate', patch.name);
 const flipHorizontal = () => emit('flipHorizontal', patch.name);
 const flipVertical = () => emit('flipVertical', patch.name);
-
+const identifyTile = (obj) => {
+  emit('identifyTile', obj);
+};
 // const flipHorizontal = () => {
 //   for (row in patch.arrengement_table.value) {
 //     row = row.map(value => -value);
@@ -63,7 +67,7 @@ button {
   overflow: hidden;
   transition: background 400ms;
   color: #fff;
-  background-color: #6ab04c;
+  background-color: rgb(0, 50, 80);
   width: 20%;
   margin: 0.1em;
   padding: 1em 1em;
@@ -81,10 +85,11 @@ button {
   transition: background 0.8s;
 }
 .ripple:hover {
-  background: #6ab04c radial-gradient(circle, transparent 1%, #6ab04c 1%) center/15000%;
+  background:
+  rgb(0, 50, 80) radial-gradient(circle, transparent 1%, rgb(0, 50, 80) 1%) center/15000%;
 }
 .ripple:active {
-  background-color: #badc58;
+  background-color: rgb(0, 100, 130);
   background-size: 100%;
   transition: background 0s;
 }

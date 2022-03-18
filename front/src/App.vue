@@ -28,5 +28,7 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 .body-elem {
   order: 1;
   flex-grow: 1;
+  background: url(assets/pw_maze_white.png);
+  background-repeat: repeat;
 }
 </style>

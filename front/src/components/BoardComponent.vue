@@ -2,7 +2,10 @@
   <div class="playerwrapper">
     <div> test </div>
     <div class='board' :style="style">
-      <div v-for="f in Array(81).fill(1)" :key="f"></div>
+      <div v-for="(f, index) in Array(81).fill(1)"
+        :key="index"
+        :data-x="index % 9"
+        :data-y="Math.floor(index / 9)"></div>
     </div>
   </div>
 </template>
