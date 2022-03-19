@@ -14,9 +14,9 @@ const props = defineProps(['xIndex', 'yIndex', 'visible', 'background']);
 const emit = defineEmits(['identifyTile']);
 
 const style = computed(() => ({
-  visibility: props.visible ? 'visible' : 'hidden',
+  opacity: props.visible ? '1' : '0',
   'background-image': `url(${require(`../assets/${props.background}.jpg`)})`,
-  'background-position': `${-3.5 * props.xIndex}vw ${-3.5 * props.yIndex}vw `,
+  'background-position': `${-3 * props.xIndex}vw ${-3 * props.yIndex}vw `,
 }));
 
 const identify = () => emit('identifyTile', { x: props.xIndex, y: props.yIndex });
@@ -26,9 +26,9 @@ const identify = () => emit('identifyTile', { x: props.xIndex, y: props.yIndex }
 <style scoped>
 .patch-elem {
   margin: 0;
-  visibility: hidden;
+  opacity: 0;
 }
 .visible {
-  visibility: initial;
+  opacity: 1;
 }
 </style>

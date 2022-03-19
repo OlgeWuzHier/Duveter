@@ -23,13 +23,12 @@ const patch = toRefs(props.patch);
 const rows = computed(() => patch.arrangement_table.value[0].length);
 
 const style = computed(() => ({
-  'grid-template-columns': `repeat(${patch.arrangement_table.value[0].length}, 3.5vw)`,
-  'grid-template-rows': `repeat(${patch.arrangement_table.value.length}, 3.5vw)`,
+  'grid-template-columns': `repeat(${patch.arrangement_table.value[0].length}, 3vw)`,
+  'grid-template-rows': `repeat(${patch.arrangement_table.value.length}, 3vw)`,
   position: props.draggable ? 'absolute' : 'static',
 }));
 
 const identifyTile = (obj) => emit('identifyTile', obj);
-
 </script>
 
 <style scoped>

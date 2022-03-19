@@ -39,19 +39,19 @@
 </template>
 
 <script setup>
-// import { inject } from 'vue';
 import interact from 'interactjs';
 import AvailablePatchComponent from '@/components/AvailablePatchComponent.vue';
 import PatchComponent from '@/components/PatchComponent.vue';
 import BoardComponent from '@/components/BoardComponent.vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import getTilesBackgrounds from '../helpers/getTilesBackgrounds';
 
-// const socket = inject('socket');
+const socket = inject('socket');
 const route = useRoute();
 const game = ref();
+
 let tilePosition = null;
 let positionValid = false;
 
@@ -59,6 +59,11 @@ axios.get(`/game?id=${route.params.id}`)
   .then((resp) => {
     game.value = resp.data.game;
   });
+
+socket.on(route.params.id, (data) => {
+  console.log(data);
+  game.value = data;
+});
 
 const availablePatches = () => game.value.patchesList.slice(0, 3);
 const comingupPatches = () => game.value.patchesList.slice(3);
@@ -89,12 +94,8 @@ const flipPatchVertically = (name) => {
   domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
 };
 
-const saveTilePosition = (obj) => {
-  tilePosition = obj;
-};
-
-const createGrid = () => [
-  ...document.querySelectorAll('.player .board>div')]
+const saveTilePosition = (obj) => { tilePosition = obj; };
+const createGrid = () => [...document.querySelectorAll('.player .board>div')]
   .map((d) => ({
     x: d.getBoundingClientRect().left,
     y: d.getBoundingClientRect().top,
@@ -133,8 +134,6 @@ const boardLoaded = () => {
           target.setAttribute('data-y', y);
         },
         end(event) {
-          console.log(`moved a distance of ${
-            (Math.sqrt((event.pageX - event.x0) ** 2 + (event.pageY - event.y0) ** 2)).toFixed(2)}px`);
           const { target } = event;
           if (!positionValid) {
             target.style.transform = 'translate(0px, 0px) translateX(-50%)';
@@ -155,7 +154,8 @@ const boardLoaded = () => {
           x: event.target.dataset.x - tilePosition.x,
           y: event.target.dataset.y - tilePosition.y,
         };
-        const patchFits = dropPosition.x + width < 10 && dropPosition.y + height < 10;
+        const patchFits = dropPosition.x + width < 10 && dropPosition.x >= 0
+          && dropPosition.y + height < 10 && dropPosition.y >= 0;
         const patchCollides = false; // TODO: Check collision
         const canAfford = true; // TODO: Check if user has resources
 
@@ -173,8 +173,6 @@ const boardLoaded = () => {
               flip: +(event.relatedTarget.dataset.flip || 0),
               rotate: +(event.relatedTarget.dataset.rotate || 0),
             },
-          }).then((resp) => {
-            game.value = resp.data.game;
           });
         }
       },

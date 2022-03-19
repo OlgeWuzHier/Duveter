@@ -34,7 +34,6 @@ const rotate = () => emit('rotate', patch.name);
 const flipHorizontal = () => emit('flipHorizontal', patch.name);
 const flipVertical = () => emit('flipVertical', patch.name);
 const identifyTile = (obj) => emit('identifyTile', obj);
-
 </script>
 
 <style scoped>

@@ -35,14 +35,14 @@ const style = {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(9, 3.5vw);
-  grid-template-rows: repeat(9, 3.5vw);
+  grid-template-columns: repeat(9, 3vw);
+  grid-template-rows: repeat(9, 3vw);
 }
 
 .board > div {
   border: 1px solid black;
   box-sizing: border-box;
-  height: 3.5vw;
-  width: 3.5vw;
+  height: 3vw;
+  width: 3vw;
 }
 </style>

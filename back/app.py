@@ -110,7 +110,57 @@ class Game(Resource):
         game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
         return { "game": json.loads(json_util.dumps(game)) }
 
+    @jwt_required()
+    def put(self):
+        if not request.args.get("id"):
+            return 'Bad request', 400
 
+        username = get_jwt_identity()
+        # TODO: Check if it is this player move
+        
+        patch = request.json.get('patch')
+
+        if patch:
+            game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
+            user = next((u for u in game['players'] if u['username'] == username), None)
+            if user is None:
+                return 'Bad request', 400
+            original_patch = next((p for p in game['patchesList'] if p['name'] == patch['name']), None)
+            if original_patch is None: 
+                return 'Bad request', 400
+
+            original_patch['flip'] = patch['flip']
+            original_patch['position'] = patch['position']
+            original_patch['rotate'] = patch['rotate']
+
+            # TODO: Check collision
+
+            # Remove used patch from game.patchesList and add to players[].patches
+            patch_index = game['patchesList'].index(
+                next((p for p in game['patchesList'] if p['name'] == patch['name']), None)
+            )
+
+            if patch_index > 2:
+                return 'Bad request', 400
+
+            game['patchesList'].pop(patch_index)
+            user['patches'].append(original_patch)
+
+            # Move patches (before taken one) to the end
+            while patch_index:
+                game['patchesList'].append(
+                    game['patchesList'].pop(0)
+                )
+                patch_index -= 1
+            
+            mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
+            socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
+            
+            return 'OK', 200
+        elif request.data.timeBalance:
+            return 'OK', 200
+        
+        return 'Bad request', 400
 
 
 api.add_resource(Login, '/login')
