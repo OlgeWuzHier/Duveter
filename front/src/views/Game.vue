@@ -15,10 +15,17 @@
       />
     </div>
     <div class='element player'>
-      <BoardComponent :player="game.players[0]" @boardLoaded="boardLoaded"/>
+      <BoardComponent
+      :player="game.players[0]"
+      @boardLoaded="boardLoaded"
+      :backgrounds="tileBackgrounds"
+      />
     </div>
     <div class='element opponent'>
-      <BoardComponent :player="game.players[1]" />
+      <BoardComponent
+      :player="game.players[1]"
+      :backgrounds="tileBackgrounds"
+      />
     </div>
     <div class='element time'>
       <div class='timeUnit' v-for="(timeunit, index) in Array(game.players[0].timeLeft).fill(1)"
@@ -39,6 +46,7 @@
 </template>
 
 <script setup>
+/* eslint-disable no-param-reassign */
 import interact from 'interactjs';
 import AvailablePatchComponent from '@/components/AvailablePatchComponent.vue';
 import PatchComponent from '@/components/PatchComponent.vue';
@@ -55,22 +63,37 @@ const game = ref();
 let tilePosition = null;
 let positionValid = false;
 
+const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
+const flipArray = (m) => m.map((row) => row.reverse());
+
+const preparePlayerPatches = () => {
+  game.value.players.forEach((player) => {
+    player.patches.forEach((patch) => {
+      for (let i = patch.rotate; i > 0; i -= 1) {
+        patch.arrangement_table = rotateArray(patch.arrangement_table);
+      }
+      if (patch.flip) {
+        patch.arrangement_table = flipArray(patch.arrangement_table);
+      }
+    });
+  });
+};
+
 axios.get(`/game?id=${route.params.id}`)
   .then((resp) => {
     game.value = resp.data.game;
+    preparePlayerPatches();
   });
 
 socket.on(route.params.id, (data) => {
   console.log(data);
   game.value = data;
+  preparePlayerPatches();
 });
 
 const availablePatches = () => game.value.patchesList.slice(0, 3);
 const comingupPatches = () => game.value.patchesList.slice(3);
 const tileBackgrounds = getTilesBackgrounds();
-
-const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
-const flipArray = (m) => m.map((row) => row.reverse());
 
 const rotatePatch = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
@@ -82,7 +105,7 @@ const rotatePatch = (name) => {
 const flipPatchHorizontally = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
   const domElem = document.getElementById(name.value);
-  patch.arrangement_table = flipArray(patch.arrangement_table);
+  patch.arrangement_table.value = flipArray(patch.arrangement_table);
   domElem.dataset.flip = (+(domElem.dataset.flip || 0) + 1) % 2;
 };
 
@@ -94,7 +117,11 @@ const flipPatchVertically = (name) => {
   domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
 };
 
-const saveTilePosition = (obj) => { tilePosition = obj; };
+const saveTilePosition = (obj) => {
+  console.log(obj);
+  tilePosition = obj;
+};
+
 const createGrid = () => [...document.querySelectorAll('.player .board>div')]
   .map((d) => ({
     x: d.getBoundingClientRect().left,
@@ -144,7 +171,7 @@ const boardLoaded = () => {
       },
     });
 
-  interact('.player .board>div')
+  interact('.player .board>.board-elem')
     .dropzone({
       ondrop(event) {
         const patch = game.value.patchesList.filter((p) => p.name === event.relatedTarget.id)[0];
