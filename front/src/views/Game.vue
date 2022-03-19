@@ -4,9 +4,10 @@
       <AvailablePatchComponent
       v-for="patch in availablePatches()"
       :key="patch.name"
-      :id="patch.name"
+      :id="`available-${patch.name}`"
       :patch="patch"
       :draggable="true"
+      :background="tileBackgrounds[patch.name]"
       @rotate="rotatePatch"
       @flipHorizontal="flipPatchHorizontally"
       @flipVertical="flipPatchVertically"
@@ -29,6 +30,7 @@
         v-for="patch in comingupPatches()"
         :key="patch.name"
         :id="patch.name"
+        :background="tileBackgrounds[patch.name]"
         :patch="patch"
         :draggable="false"/>
       </div>
@@ -37,7 +39,6 @@
 </template>
 
 <script setup>
-
 // import { inject } from 'vue';
 import interact from 'interactjs';
 import AvailablePatchComponent from '@/components/AvailablePatchComponent.vue';
@@ -46,6 +47,7 @@ import BoardComponent from '@/components/BoardComponent.vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
+import getTilesBackgrounds from '../helpers/getTilesBackgrounds';
 
 // const socket = inject('socket');
 const route = useRoute();
@@ -60,23 +62,31 @@ axios.get(`/game?id=${route.params.id}`)
 
 const availablePatches = () => game.value.patchesList.slice(0, 3);
 const comingupPatches = () => game.value.patchesList.slice(3);
+const tileBackgrounds = getTilesBackgrounds();
 
 const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
 const flipArray = (m) => m.map((row) => row.reverse());
 
 const rotatePatch = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  const domElem = document.getElementById(name.value);
   patch.arrangement_table = rotateArray(patch.arrangement_table);
+  domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 1) % 4;
 };
 
 const flipPatchHorizontally = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  const domElem = document.getElementById(name.value);
   patch.arrangement_table = flipArray(patch.arrangement_table);
+  domElem.dataset.flip = (+(domElem.dataset.flip || 0) + 1) % 2;
 };
 
 const flipPatchVertically = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
+  const domElem = document.getElementById(name.value);
   patch.arrangement_table = rotateArray(rotateArray(flipArray(patch.arrangement_table)));
+  domElem.dataset.flip = (+(domElem.dataset.flip || 0) + 1) % 2;
+  domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
 };
 
 const saveTilePosition = (obj) => {
@@ -102,8 +112,6 @@ const getModifiers = () => [
 ];
 
 const boardLoaded = () => {
-  window.availablePatches = availablePatches();
-
   interact('.draggable')
     .draggable({
       inertia: false,
@@ -140,21 +148,34 @@ const boardLoaded = () => {
   interact('.player .board>div')
     .dropzone({
       ondrop(event) {
-        // console.log(event.target);
-        // window.target = event.target;
-        console.log(`${event.relatedTarget.id} was dropped into 
-          x: ${event.target.dataset.x}, 
-          y: ${event.target.dataset.y}`);
-
         const patch = game.value.patchesList.filter((p) => p.name === event.relatedTarget.id)[0];
         const width = patch.arrangement_table[0].length;
         const height = patch.arrangement_table.length;
-        positionValid = true;
-        console.log(event.target.dataset.x, tilePosition.x, width);
-        console.log(event.target.dataset.y, tilePosition.y, height);
-        if (event.target.dataset.x - tilePosition.x + width > 9
-          || event.target.dataset.y - tilePosition.y + height > 9) {
-          positionValid = false;
+        const dropPosition = {
+          x: event.target.dataset.x - tilePosition.x,
+          y: event.target.dataset.y - tilePosition.y,
+        };
+        const patchFits = dropPosition.x + width < 10 && dropPosition.y + height < 10;
+        const patchCollides = false; // TODO: Check collision
+        const canAfford = true; // TODO: Check if user has resources
+
+        console.log(`${event.relatedTarget.id} was dropped into`, dropPosition);
+
+        if (patchFits && !patchCollides && canAfford) {
+          positionValid = true;
+          axios.put(`/game?id=${route.params.id}`, {
+            patch: {
+              name: event.relatedTarget.id,
+              position: {
+                x: dropPosition.x,
+                y: dropPosition.y,
+              },
+              flip: +(event.relatedTarget.dataset.flip || 0),
+              rotate: +(event.relatedTarget.dataset.rotate || 0),
+            },
+          }).then((resp) => {
+            game.value = resp.data.game;
+          });
         }
       },
     });

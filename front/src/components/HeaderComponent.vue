@@ -5,7 +5,7 @@
     </router-link>
     <nav class="flexitem">
       <div class="navitem">
-        <font-awesome-icon :icon="['fas', 'moon']" />
+        <font-awesome-icon :icon="['fas', 'moon']"/>
       </div>
       <router-link class="navitem" to="/">
         <font-awesome-icon :icon="['fas', 'play']" style="padding-right: 10px;"/>

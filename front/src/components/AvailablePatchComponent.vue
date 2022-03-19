@@ -1,5 +1,5 @@
 <template>
-  <div class='available-wrapper' :style="style">
+  <div class='available-wrapper'>
     <button class="ripple" @click="rotate">
       <font-awesome-icon :icon="['fas', 'rotate-right']" />
     </button>
@@ -13,42 +13,27 @@
       :patch="props.patch"
       :id="props.patch.name"
       :draggable="true"
+      :background="props.background"
       class="draggable"
       @identifyTile='identifyTile'/>
   </div>
 </template>
 
 <script setup>
-/* eslint-disable vue/no-mutating-props */
 import PatchComponent from '@/components/PatchComponent.vue';
 import { toRefs, defineProps, defineEmits } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faRotateRight, faUpDown } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faRotateRight, faUpDown);
-const props = defineProps(['patch', 'draggable', 'patternPath']);
+const props = defineProps(['patch', 'draggable', 'patternPath', 'background']);
 const emit = defineEmits(['rotate', 'flipHorizontal', 'flipVertical', 'identifyTile']);
 const patch = toRefs(props.patch);
-
-// const cols = patch.arrangement_table.value.length;
-// const rows = patch.arrangement_table.value[0].length;
 
 const rotate = () => emit('rotate', patch.name);
 const flipHorizontal = () => emit('flipHorizontal', patch.name);
 const flipVertical = () => emit('flipVertical', patch.name);
-const identifyTile = (obj) => {
-  emit('identifyTile', obj);
-};
-// const flipHorizontal = () => {
-//   for (row in patch.arrengement_table.value) {
-//     row = row.map(value => -value);
-//   };
-// };
-const style = {
-  // width: `${12 * patch.arrangement_table.value.length}px`,
-  // height: `${12 * patch.arrangement_table.value[0].length}px`,
-  // transform: `translateY(${rows * -2}vw)`,
-};
+const identifyTile = (obj) => emit('identifyTile', obj);
 
 </script>
 
