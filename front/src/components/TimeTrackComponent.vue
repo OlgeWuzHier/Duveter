@@ -37,9 +37,6 @@ import getUsername from '../helpers/getUsername';
 
 library.add(faPiggyBank, faSquare);
 const props = defineProps(['players', 'coinFields', 'bonusPatchFields']);
-// // const emit = defineEmits(['identifyTile']);
-
-console.log(53 - props.players.filter((p) => p.username === getUsername())[0].timeLeft);
 
 const playerPawnStyle = computed(() => ({
   left: `calc(${1 + 2 * (53 - props.players.filter((p) => p.username === getUsername())[0].timeLeft)}*100% / 108)`,
@@ -48,8 +45,6 @@ const playerPawnStyle = computed(() => ({
 const opponentPawnStyle = computed(() => ({
   left: `calc(${1 + 2 * (53 - props.players.filter((p) => p.username !== getUsername())[0].timeLeft)}*100% / 108)`,
 }));
-
-// const identify = () => emit('identifyTile', { x: props.xIndex, y: props.yIndex });
 
 </script>
 

@@ -154,12 +154,17 @@ class Game(Resource):
                 patch_index -= 1
             
             # Pay for patch
+            time_before = user['timeLeft']
             user['timeLeft'] -= original_patch['price_time']
             user['coins'] -= original_patch['price_coins']
 
             if user['coins'] < 0:
                 return 'Bad request', 400
 
+
+            for coin_field in game['coinFields']:
+                if user['timeLeft'] <= coin_field < time_before:
+                    user['coins'] += sum(p['income_value'] for p in user['patches'])
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             

@@ -254,7 +254,6 @@ const boardLoaded = () => {
     'available time time'
     'comingup comingup comingup';
     column-gap: 10px;
-    row-gap: 10px;
     justify-content: stretch;
     align-content: stretch;
     overflow: hidden;
@@ -262,7 +261,6 @@ const boardLoaded = () => {
   }
 
   .element {
-    border: 1px solid black;
     box-sizing: border-box;
   }
 
@@ -289,10 +287,13 @@ const boardLoaded = () => {
 
   .time {
     grid-area: time;
-    display: flex;
+    border: 1px solid black;
+    border-bottom: none;
   }
 
   .comingup {
+    border-top: 1px solid black;
+    padding-top: 1vw;
     grid-area: comingup;
     overflow-x: auto;
     overflow-y: hidden;
@@ -300,7 +301,7 @@ const boardLoaded = () => {
 
   .patches-container {
     display: flex;
-    transform: scale(0.5);
+    transform: scale(0.45);
     transform-origin: top left;
   }
 
