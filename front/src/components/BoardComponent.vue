@@ -54,21 +54,29 @@ onMounted(() => {
   align-items: center;
 }
 
+.player .board {
+  border: 15px solid rgba(126, 214, 223, .7);
+  background: rgba(34, 166, 179, .4);
+}
+
+.opponent .board {
+  border: 15px solid rgba(255, 121, 121, .7);
+  background: rgba(235, 77, 75, .4);
+}
+
 .board {
   z-index: 0;
   position: relative;
-  border: 20px solid #f6e58d;
   border-radius: 20px;
   display: grid;
   grid-template-columns: repeat(9, 3vw);
   grid-template-rows: repeat(9, 3vw);
-  background: rgba(249, 202, 36, 0.7);
   box-sizing: border-box;
 }
 
 .board > .board-elem {
   /* z-index: 100; */
-  border: 1px solid rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.75);
   box-sizing: border-box;
   height: 3vw;
   width: 3vw;

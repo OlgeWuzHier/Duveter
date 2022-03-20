@@ -28,11 +28,10 @@
       />
     </div>
     <div class='element time'>
-      <div class='timeUnit'
-        v-for="(timeunit, index) in Array(game.players.filter((p) =>
-          p.username === getUsername())[0].timeLeft).fill(1)"
-        :key="index">
-      </div>
+      <TimeTrackComponent
+      :players="game.players"
+      :coinFields="game.coinFields"
+      :bonusPatchFields="game.bonusPatchFields" />
     </div>
     <div class='element comingup'>
       <div class='patches-container'>
@@ -54,6 +53,7 @@ import interact from 'interactjs';
 import AvailablePatchComponent from '@/components/AvailablePatchComponent.vue';
 import PatchComponent from '@/components/PatchComponent.vue';
 import BoardComponent from '@/components/BoardComponent.vue';
+import TimeTrackComponent from '@/components/TimeTrackComponent.vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { ref, inject } from 'vue';
@@ -228,6 +228,12 @@ const boardLoaded = () => {
               flip: +(event.relatedTarget.dataset.flip || 0),
               rotate: +(event.relatedTarget.dataset.rotate || 0),
             },
+          }).catch((err) => {
+            const { relatedTarget } = event;
+            relatedTarget.style.transform = 'translate(0px, 0px) translateX(-50%)';
+            relatedTarget.setAttribute('data-x', 0);
+            relatedTarget.setAttribute('data-y', 0);
+            console.log(err);
           });
         }
       },
@@ -272,7 +278,6 @@ const boardLoaded = () => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-
   }
 
   .opponent {
@@ -285,14 +290,6 @@ const boardLoaded = () => {
   .time {
     grid-area: time;
     display: flex;
-  }
-
-  .timeUnit {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    border: 1px solid blue;
-    background-color: gray;
   }
 
   .comingup {

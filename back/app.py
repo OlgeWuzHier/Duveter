@@ -153,6 +153,13 @@ class Game(Resource):
                 )
                 patch_index -= 1
             
+            # Pay for patch
+            user['timeLeft'] -= original_patch['price_time']
+            user['coins'] -= original_patch['price_coins']
+
+            if user['coins'] < 0:
+                return 'Bad request', 400
+
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             
