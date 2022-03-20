@@ -16,20 +16,23 @@
     </div>
     <div class='element player'>
       <BoardComponent
-      :player="game.players[0]"
+      :player="game.players.filter((p) => p.username === getUsername())[0]"
       @boardLoaded="boardLoaded"
       :backgrounds="tileBackgrounds"
       />
     </div>
     <div class='element opponent'>
       <BoardComponent
-      :player="game.players[1]"
+      :player="game.players.filter((p) => p.username !== getUsername())[0]"
       :backgrounds="tileBackgrounds"
       />
     </div>
     <div class='element time'>
-      <div class='timeUnit' v-for="(timeunit, index) in Array(game.players[0].timeLeft).fill(1)"
-      :key="index"></div>
+      <div class='timeUnit'
+        v-for="(timeunit, index) in Array(game.players.filter((p) =>
+          p.username === getUsername())[0].timeLeft).fill(1)"
+        :key="index">
+      </div>
     </div>
     <div class='element comingup'>
       <div class='patches-container'>
@@ -55,6 +58,7 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { ref, inject } from 'vue';
 import getTilesBackgrounds from '../helpers/getTilesBackgrounds';
+import getUsername from '../helpers/getUsername';
 
 const socket = inject('socket');
 const route = useRoute();
@@ -85,6 +89,7 @@ axios.get(`/game?id=${route.params.id}`)
     preparePlayerPatches();
   });
 
+socket.removeAllListeners();
 socket.on(route.params.id, (data) => {
   game.value = data;
   preparePlayerPatches();
@@ -126,6 +131,28 @@ const createGrid = () => [...document.querySelectorAll('.player .board>div')]
     x: d.getBoundingClientRect().left,
     y: d.getBoundingClientRect().top,
   }));
+
+const getBoardArrangementTable = (newPatchArrangementTable, dropPosition) => {
+  const player = game.value.players.filter((p) => p.username === getUsername())[0];
+  /* eslint-disable no-unused-vars */
+  const arrangementTable = Array.from({ length: 9 }, (e) => Array(9).fill(0));
+  const tempPatch = {
+    arrangement_table: newPatchArrangementTable,
+    position: dropPosition,
+  };
+
+  [tempPatch, ...player.patches].forEach((patch) => {
+    const [x, y] = [patch.position.x, patch.position.y];
+    const [width, height] = [patch.arrangement_table[0].length, patch.arrangement_table.length];
+    console.log(x, y, width, height);
+    for (let i = 0; i < width; i += 1) {
+      for (let j = 0; j < height; j += 1) {
+        arrangementTable[j + y][i + x] += patch.arrangement_table[j][i];
+      }
+    }
+  });
+  return arrangementTable;
+};
 
 const getModifiers = () => [
   interact.modifiers.restrictRect({
@@ -184,7 +211,10 @@ const boardLoaded = () => {
         };
         const patchFits = dropPosition.x + width < 10 && dropPosition.x >= 0
           && dropPosition.y + height < 10 && dropPosition.y >= 0;
-        const patchCollides = false; // TODO: Check collision
+        const boardArrangementTable = getBoardArrangementTable(
+          patch.arrangement_table, dropPosition,
+        );
+        const patchCollides = !!boardArrangementTable.flat().filter((x) => x > 1).length;
         const canAfford = true; // TODO: Check if user has resources
 
         console.log(`${event.relatedTarget.id} was dropped into`, dropPosition);
@@ -194,10 +224,7 @@ const boardLoaded = () => {
           axios.put(`/game?id=${route.params.id}`, {
             patch: {
               name: event.relatedTarget.id,
-              position: {
-                x: dropPosition.x,
-                y: dropPosition.y,
-              },
+              position: dropPosition,
               flip: +(event.relatedTarget.dataset.flip || 0),
               rotate: +(event.relatedTarget.dataset.rotate || 0),
             },

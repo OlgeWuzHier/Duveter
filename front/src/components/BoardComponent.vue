@@ -1,6 +1,11 @@
 <template>
   <div class="playerwrapper">
-    <div> test </div>
+    <div class="description">
+      <h3>{{props.player.username}}'s board</h3>
+      <div>Coins <font-awesome-icon :icon="['fas', 'coins']" />: {{props.player.coins}}</div>
+      <div>Income <font-awesome-icon :icon="['fas', 'piggy-bank']" />:
+      {{props.player.patches.map(p => p.income_value).reduce((prev, next) => prev + next, 0)}}</div>
+    </div>
     <div class='board'>
       <div v-for="(f, index) in Array(81).fill(1)"
         class="board-elem"
@@ -21,9 +26,14 @@
 
 <script setup>
 import { defineEmits, onMounted, defineProps } from 'vue';
-import PatchComponent from './PatchComponent.vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCoins, faPiggyBank,
+} from '@fortawesome/free-solid-svg-icons';
 import getUsername from '../helpers/getUsername';
+import PatchComponent from './PatchComponent.vue';
 
+library.add(faCoins, faPiggyBank);
 const props = defineProps(['player', 'backgrounds']);
 const emit = defineEmits(['boardLoaded']);
 
@@ -67,5 +77,9 @@ onMounted(() => {
 .board .wrapper {
   position: absolute !important;
   margin: 0;
+}
+.description {
+  color: black;
+  font-size: 1.3em;
 }
 </style>

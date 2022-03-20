@@ -16,6 +16,14 @@
       :background="props.background"
       class="draggable"
       @identifyTile='identifyTile'/>
+    <div class="description">
+      <font-awesome-icon :icon="['fas', 'coins']" />:
+        {{props.patch.price_coins}}
+      <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="transform: scaleX(-1);"/>:
+        {{props.patch.price_time}}
+      <font-awesome-icon :icon="['fas', 'piggy-bank']" />:
+        +{{props.patch.income_value}}
+    </div>
   </div>
 </template>
 
@@ -23,10 +31,12 @@
 import PatchComponent from '@/components/PatchComponent.vue';
 import { toRefs, defineProps, defineEmits } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faRotateRight, faUpDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faRotateRight, faUpDown, faCoins, faPiggyBank, faClockRotateLeft,
+} from '@fortawesome/free-solid-svg-icons';
 
-library.add(faRotateRight, faUpDown);
-const props = defineProps(['patch', 'draggable', 'patternPath', 'background']);
+library.add(faRotateRight, faUpDown, faCoins, faPiggyBank, faClockRotateLeft);
+const props = defineProps(['patch', 'draggable', 'background']);
 const emit = defineEmits(['rotate', 'flipHorizontal', 'flipVertical', 'identifyTile']);
 const patch = toRefs(props.patch);
 
@@ -43,7 +53,7 @@ const identifyTile = (obj) => emit('identifyTile', obj);
   position: relative;
 }
 .available-wrapper .wrapper {
-  margin: 10% 50%;
+  margin: 1% 50% 10%;
   transform: translateX(-50%);
 }
 button {
@@ -76,5 +86,18 @@ button {
   background-color: rgb(0, 100, 130);
   background-size: 100%;
   transition: background 0s;
+}
+.description {
+  color: black;
+  position: absolute;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  font-size: 1.5em;
+  text-align: center;
+  z-index: 1000;
 }
 </style>
