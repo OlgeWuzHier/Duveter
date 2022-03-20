@@ -119,6 +119,7 @@ class Game(Resource):
         # TODO: Check if it is this player move
         
         patch = request.json.get('patch')
+        time_balance = request.json.get('timeBalance')
 
         if patch:
             game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
@@ -161,15 +162,33 @@ class Game(Resource):
             if user['coins'] < 0:
                 return 'Bad request', 400
 
-
+            # Add money if applicable
             for coin_field in game['coinFields']:
                 if user['timeLeft'] <= coin_field < time_before:
                     user['coins'] += sum(p['income_value'] for p in user['patches'])
+
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             
             return 'OK', 200
-        elif request.data.timeBalance:
+
+        elif time_balance:
+            game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
+            user = next((u for u in game['players'] if u['username'] == username), None)
+            if user is None:
+                return 'Bad request', 400
+            
+            time_before = user['timeLeft']
+            user['timeLeft'] -= time_balance
+            user['coins'] += time_balance
+
+            # Add money if applicable
+            for coin_field in game['coinFields']:
+                if user['timeLeft'] <= coin_field < time_before:
+                    user['coins'] += sum(p['income_value'] for p in user['patches'])
+
+            mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
+            socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             return 'OK', 200
         
         return 'Bad request', 400

@@ -56,37 +56,23 @@ const identifyTile = (obj) => emit('identifyTile', obj);
   margin: 1% 50% 10%;
   transform: translateX(-50%);
 }
+
 button {
-  position: relative;
-  overflow: hidden;
-  transition: background 400ms;
-  color: #fff;
   background-color: rgb(0, 50, 80);
   width: 20%;
-  margin: 0.1em;
-  padding: 1em 1em;
-  font-family: 'Patrick Hand', sans-serif;
-  font-size: 1.5rem;
-  outline: 0;
-  border: 0;
-  border-radius: 0.25rem;
-  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
-  cursor: pointer;
+  margin: 0.15em;
+  padding: 0.5em 0.5em;
+  min-width: 50px;
 }
 
-.ripple {
-  background-position: center;
-  transition: background 0.8s;
-}
 .ripple:hover {
   background:
-  rgb(0, 50, 80) radial-gradient(circle, transparent 1%, rgb(0, 50, 80) 1%) center/15000%;
+    rgb(0, 50, 80) radial-gradient(circle, transparent 1%, rgb(0, 50, 80) 1%) center/15000%;
 }
 .ripple:active {
   background-color: rgb(0, 100, 130);
-  background-size: 100%;
-  transition: background 0s;
 }
+
 .description {
   color: black;
   position: absolute;

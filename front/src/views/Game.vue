@@ -18,6 +18,7 @@
       <BoardComponent
       :player="game.players.filter((p) => p.username === getUsername())[0]"
       @boardLoaded="boardLoaded"
+      @exchangeTimeForMoney="exchangeTimeForMoney"
       :backgrounds="tileBackgrounds"
       />
     </div>
@@ -67,6 +68,8 @@ const game = ref();
 let tilePosition = null;
 let positionValid = false;
 
+const availablePatches = () => game.value.patchesList.slice(0, 3);
+const comingupPatches = () => game.value.patchesList.slice(3);
 const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
 const flipArray = (m) => m.map((row) => row.reverse());
 
@@ -83,6 +86,16 @@ const preparePlayerPatches = () => {
   });
 };
 
+const removePatchRotation = () => {
+  availablePatches().forEach((patch) => {
+    console.log(patch);
+    const domElem = document.getElementById(patch.name);
+    console.log(domElem);
+    domElem.dataset.rotate = '0';
+    domElem.dataset.flip = '0';
+  });
+};
+
 axios.get(`/game?id=${route.params.id}`)
   .then((resp) => {
     game.value = resp.data.game;
@@ -93,10 +106,9 @@ socket.removeAllListeners();
 socket.on(route.params.id, (data) => {
   game.value = data;
   preparePlayerPatches();
+  removePatchRotation();
 });
 
-const availablePatches = () => game.value.patchesList.slice(0, 3);
-const comingupPatches = () => game.value.patchesList.slice(3);
 const tileBackgrounds = getTilesBackgrounds();
 
 const rotatePatch = (name) => {
@@ -125,6 +137,12 @@ const flipPatchVertically = (name) => {
 };
 
 const saveTilePosition = (obj) => { tilePosition = obj; };
+
+const exchangeTimeForMoney = () => {
+  axios.put(`/game?id=${route.params.id}`, {
+    timeBalance: 1,
+  });
+};
 
 const createGrid = () => [...document.querySelectorAll('.player .board>div')]
   .map((d) => ({
@@ -317,38 +335,5 @@ const boardLoaded = () => {
   .element-c {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
-  }
-
-  button {
-    margin-top: 5vh;
-    position: relative;
-    overflow: hidden;
-    transition: background 400ms;
-    color: #fff;
-    background-color: #6ab04c;
-    width: 30%;
-    max-width: 400px;
-    min-width: 150px;
-    padding: 1em 2rem;
-    font-family: 'Patrick Hand', sans-serif;
-    font-size: 1.5rem;
-    outline: 0;
-    border: 0;
-    border-radius: 0.25rem;
-    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-  }
-
-  .ripple {
-    background-position: center;
-    transition: background 0.8s;
-  }
-  .ripple:hover {
-    background: #6ab04c radial-gradient(circle, transparent 1%, #6ab04c 1%) center/15000%;
-  }
-  .ripple:active {
-    background-color: #badc58;
-    background-size: 100%;
-    transition: background 0s;
   }
 </style>

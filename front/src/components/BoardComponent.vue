@@ -5,6 +5,10 @@
       <div>Coins <font-awesome-icon :icon="['fas', 'coins']" />: {{props.player.coins}}</div>
       <div>Income <font-awesome-icon :icon="['fas', 'piggy-bank']" />:
       {{props.player.patches.map(p => p.income_value).reduce((prev, next) => prev + next, 0)}}</div>
+      <button :style="buttonStyle" @click="exchangeTimeForMoney">
+        +1 <font-awesome-icon :icon="['fas', 'coins']" style="margin-right: 8px;"/>
+        -1 <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="transform: scaleX(-1);"/>
+      </button>
     </div>
     <div class='board'>
       <div v-for="(f, index) in Array(81).fill(1)"
@@ -25,7 +29,9 @@
 </template>
 
 <script setup>
-import { defineEmits, onMounted, defineProps } from 'vue';
+import {
+  defineEmits, onMounted, defineProps, computed,
+} from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faCoins, faPiggyBank,
@@ -35,13 +41,19 @@ import PatchComponent from './PatchComponent.vue';
 
 library.add(faCoins, faPiggyBank);
 const props = defineProps(['player', 'backgrounds']);
-const emit = defineEmits(['boardLoaded']);
+const emit = defineEmits(['boardLoaded', 'exchangeTimeForMoney']);
 
 onMounted(() => {
   if (getUsername() === props.player.username) {
     emit('boardLoaded', true);
   }
 });
+
+const exchangeTimeForMoney = () => emit('exchangeTimeForMoney');
+
+const buttonStyle = computed(() => ({
+  visibility: getUsername() === props.player.username ? 'visible' : 'hidden',
+}));
 
 </script>
 
@@ -50,8 +62,13 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
+}
+
+.description {
+  color: black;
+  font-size: 1.3em;
 }
 
 .player .board {
@@ -86,8 +103,10 @@ onMounted(() => {
   position: absolute !important;
   margin: 0;
 }
-.description {
-  color: black;
-  font-size: 1.3em;
+
+button {
+  padding: 0.5em;
+  margin-top: 0.5em;
 }
+
 </style>
