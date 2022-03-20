@@ -140,6 +140,8 @@ const getModifiers = () => [
 ];
 
 const boardLoaded = () => {
+  interact('.draggable').unset();
+  interact('.player .board>.board-elem').unset();
   interact('.draggable')
     .draggable({
       inertia: false,
