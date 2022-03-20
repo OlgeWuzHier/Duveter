@@ -72,7 +72,10 @@ const preparePlayerPatches = () => {
       for (let i = patch.rotate; i > 0; i -= 1) {
         patch.arrangement_table = rotateArray(patch.arrangement_table);
       }
-      if (patch.flip) {
+      if (patch.vFlip) {
+        patch.arrangement_table = rotateArray(rotateArray(flipArray(patch.arrangement_table)));
+      }
+      if (patch.hFlip) {
         patch.arrangement_table = flipArray(patch.arrangement_table);
       }
     });
@@ -99,21 +102,24 @@ const rotatePatch = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
   const domElem = document.getElementById(name.value);
   patch.arrangement_table = rotateArray(patch.arrangement_table);
-  domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 1) % 4;
+  const rotationChange = (
+    (+domElem.dataset.vFlip || 0)
+    + (+domElem.dataset.hFlip || 0) / 2) ? 3 : 1;
+  domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + rotationChange) % 4;
 };
 
 const flipPatchHorizontally = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
   const domElem = document.getElementById(name.value);
   patch.arrangement_table.value = flipArray(patch.arrangement_table);
-  domElem.dataset.flip = (+(domElem.dataset.flip || 0) + 1) % 2;
+  domElem.dataset.hFlip = (+(domElem.dataset.hFlip || 0) + 1) % 2;
 };
 
 const flipPatchVertically = (name) => {
   const patch = game.value.patchesList.filter((x) => x.name === name.value)[0];
   const domElem = document.getElementById(name.value);
   patch.arrangement_table = rotateArray(rotateArray(flipArray(patch.arrangement_table)));
-  domElem.dataset.flip = (+(domElem.dataset.flip || 0) + 1) % 2;
+  domElem.dataset.vFlip = (+(domElem.dataset.vFlip || 0) + 1) % 2;
   domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
 };
 
@@ -199,7 +205,8 @@ const boardLoaded = () => {
                 x: dropPosition.x,
                 y: dropPosition.y,
               },
-              flip: +(event.relatedTarget.dataset.flip || 0),
+              vFlip: +(event.relatedTarget.dataset.vFlip || 0),
+              hFlip: +(event.relatedTarget.dataset.hFlip || 0),
               rotate: +(event.relatedTarget.dataset.rotate || 0),
             },
           });
