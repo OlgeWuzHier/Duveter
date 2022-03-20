@@ -69,7 +69,7 @@ class Queue(Resource):
             player1 = mongo.db.queue.find_one_and_delete({ 'username': username })
             player2 = mongo.db.queue.find_one_and_delete({})
             
-            with open("patches.json", 'r') as j:
+            with open("patches2.json", 'r') as j:
                 patches = json.loads(j.read())
                 random.shuffle(patches)
                 starter_index = patches.index(next(p for p in patches if p['name'] == "starter"))

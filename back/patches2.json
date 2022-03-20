@@ -1,0 +1,209 @@
+[
+  {
+    "name": "starter",
+    "arrangement_table": [[1, 1]],
+    "price_coins": 2,
+    "price_time": 1,
+    "income_value": 0
+  },
+  {
+    "name": "squareAppendixLong",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong2",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong3",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong4",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong5",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong6",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong7",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong8",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong9",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong10",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong11",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong12",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong13",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong14",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong15",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong16",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong17",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong18",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong19",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong20",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong21",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong22",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong23",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong24",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  },
+  {
+    "name": "squareAppendixLong25",
+    "arrangement_table": [[1, 1, 1, 1],
+                          [1, 1, 0, 0]],
+    "price_coins": 10,
+    "price_time": 5,
+    "income_value": 3
+  }
+]
