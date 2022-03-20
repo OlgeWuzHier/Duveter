@@ -86,7 +86,6 @@ axios.get(`/game?id=${route.params.id}`)
   });
 
 socket.on(route.params.id, (data) => {
-  console.log(data);
   game.value = data;
   preparePlayerPatches();
 });
@@ -100,6 +99,9 @@ const rotatePatch = (name) => {
   const domElem = document.getElementById(name.value);
   patch.arrangement_table = rotateArray(patch.arrangement_table);
   domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 1) % 4;
+  if (domElem.dataset.flip === '1') {
+    domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
+  }
 };
 
 const flipPatchHorizontally = (name) => {
@@ -117,10 +119,7 @@ const flipPatchVertically = (name) => {
   domElem.dataset.rotate = (+(domElem.dataset.rotate || 0) + 2) % 4;
 };
 
-const saveTilePosition = (obj) => {
-  console.log(obj);
-  tilePosition = obj;
-};
+const saveTilePosition = (obj) => { tilePosition = obj; };
 
 const createGrid = () => [...document.querySelectorAll('.player .board>div')]
   .map((d) => ({
