@@ -33,6 +33,11 @@ export default function getTilesBackgrounds() {
     'hehe',
     'tetris',
     'spaceBattleship',
+    'special4',
+    'special3',
+    'special2',
+    'special1',
+    'special0',
   ];
 
   const backgrounds = Array.from({ length: 42 }, (_, i) => i + 1);

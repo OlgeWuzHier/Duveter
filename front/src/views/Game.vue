@@ -68,8 +68,20 @@ const game = ref();
 let tilePosition = null;
 let positionValid = false;
 
-const availablePatches = () => game.value.patchesList.slice(0, 3);
-const comingupPatches = () => game.value.patchesList.slice(3);
+const availablePatches = () => {
+  if (game.value.patchesList[0].name.includes('special')) {
+    return game.value.patchesList.slice(0, 1);
+  }
+  return game.value.patchesList.slice(0, 3);
+};
+
+const comingupPatches = () => {
+  if (game.value.patchesList[0].name.includes('special')) {
+    return game.value.patchesList.slice(1);
+  }
+  return game.value.patchesList.slice(3);
+};
+
 const rotateArray = (m) => m[0].map((val, index) => m.map((row) => row[index]).reverse());
 const flipArray = (m) => m.map((row) => row.reverse());
 
@@ -91,8 +103,12 @@ const removePatchRotation = () => {
     console.log(patch);
     const domElem = document.getElementById(patch.name);
     console.log(domElem);
-    domElem.dataset.rotate = '0';
-    domElem.dataset.flip = '0';
+    if (domElem.dataset.rotate) {
+      domElem.dataset.rotate = '0';
+    }
+    if (domElem.dataset.flip) {
+      domElem.dataset.flip = '0';
+    }
   });
 };
 

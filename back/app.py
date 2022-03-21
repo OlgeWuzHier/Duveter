@@ -94,7 +94,7 @@ class Queue(Resource):
                             "timeLeft": 53,
                         },
                     ],
-                    "lastPlayer": player1["username"],
+                    "forcePlayer": None,
                 })
             
             socketio.emit(f'lobby-{player1["username"]}', json_util.dumps(game.inserted_id))
@@ -141,9 +141,15 @@ class Game(Resource):
                 next((p for p in game['patchesList'] if p['name'] == patch['name']), None)
             )
 
+            # Allow to choose only patches with 0, 1 or 2 index
             if patch_index > 2:
                 return 'Bad request', 400
 
+            # Allow to choose only special if it is available
+            if patch_index > 0 and 'special' in game['patchesList'][0]['name']:
+                return 'Bad request', 400
+            
+            # Add patch to user patches, remove from available
             game['patchesList'].pop(patch_index)
             user['patches'].append(original_patch)
 
@@ -167,6 +173,23 @@ class Game(Resource):
                 if user['timeLeft'] <= coin_field < time_before:
                     user['coins'] += sum(p['income_value'] for p in user['patches'])
 
+            # Add bonus patch if applicable
+            if len(game['bonusPatchFields']):
+                if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
+                    game['bonusPatchFields'].pop()
+                    game['patchesList'].insert(0, {
+                        "name": f"special{len(game['bonusPatchFields'])}",
+                        "arrangement_table": [[1]],
+                        "price_coins": 0,
+                        "price_time": 0,
+                        "income_value": 0
+                    })
+                    game['forcePlayer'] = user['username']
+
+            # If both players have the same time left, current makes move again
+            if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
+                game['forcePlayer'] = user['username']
+
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             
@@ -187,6 +210,23 @@ class Game(Resource):
                 if user['timeLeft'] <= coin_field < time_before:
                     user['coins'] += sum(p['income_value'] for p in user['patches'])
 
+            # Add bonus patch if applicable
+            if len(game['bonusPatchFields']):
+                if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
+                    game['bonusPatchFields'].pop()
+                    game['patchesList'].insert(0, {
+                        "name": f"special{len(game['bonusPatchFields'])}",
+                        "arrangement_table": [[1]],
+                        "price_coins": 0,
+                        "price_time": 0,
+                        "income_value": 0
+                    })
+                    game['forcePlayer'] = user['username']
+
+            # If both players have the same time left, current makes move again
+            if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
+                game['forcePlayer'] = user['username']
+
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
             return 'OK', 200
@@ -198,11 +238,6 @@ api.add_resource(Login, '/login')
 api.add_resource(Register, '/register')
 api.add_resource(Queue, '/queue')
 api.add_resource(Game, '/game')
-
-
-@socketio.on('connect')
-def connect():
-    emit('response', {"data": "connected"})
 
 
 if __name__ == '__main__':

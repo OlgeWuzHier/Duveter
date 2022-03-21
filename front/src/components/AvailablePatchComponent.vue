@@ -50,6 +50,7 @@ const identifyTile = (obj) => emit('identifyTile', obj);
 .available-wrapper {
   flex-grow: 1;
   width: 100%;
+  max-height: 34%;
   position: relative;
 }
 .available-wrapper .wrapper {

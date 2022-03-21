@@ -5,7 +5,7 @@
       <div>Coins <font-awesome-icon :icon="['fas', 'coins']" />: {{props.player.coins}}</div>
       <div>Income <font-awesome-icon :icon="['fas', 'piggy-bank']" />:
       {{props.player.patches.map(p => p.income_value).reduce((prev, next) => prev + next, 0)}}</div>
-      <button :style="buttonStyle" @click="exchangeTimeForMoney">
+      <button class="ripple" :style="buttonStyle" @click="exchangeTimeForMoney">
         +1 <font-awesome-icon :icon="['fas', 'coins']" style="margin-right: 8px;"/>
         -1 <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="transform: scaleX(-1);"/>
       </button>
@@ -105,8 +105,18 @@ const buttonStyle = computed(() => ({
 }
 
 button {
+  background-color: rgb(0, 50, 80);
   padding: 0.5em;
   margin-top: 0.5em;
+}
+
+.ripple:hover {
+  background:
+    rgb(0, 50, 80) radial-gradient(circle, transparent 1%, rgb(0, 50, 80) 1%) center/15000%;
+}
+
+.ripple:active {
+  background-color: rgb(0, 100, 130);
 }
 
 </style>
