@@ -5,6 +5,10 @@
       <div>Coins <font-awesome-icon :icon="['fas', 'coins']" />: {{props.player.coins}}</div>
       <div>Income <font-awesome-icon :icon="['fas', 'piggy-bank']" />:
       {{props.player.patches.map(p => p.income_value).reduce((prev, next) => prev + next, 0)}}</div>
+      <div v-if="props.player.timeLeft <= 0">Score <font-awesome-icon :icon="['fas', 'star']" />:
+      {{- 162 + props.player.coins +
+        2 * props.player.patches.map(p => p.arrangement_table.flat()).flat()
+          .reduce((prev, next) => +prev + +next, 0)}}</div>
       <button class="ripple" :style="buttonStyle" @click="exchangeTimeForMoney">
         +1 <font-awesome-icon :icon="['fas', 'coins']" style="margin-right: 8px;"/>
         -1 <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="transform: scaleX(-1);"/>
@@ -34,12 +38,12 @@ import {
 } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faCoins, faPiggyBank,
+  faCoins, faPiggyBank, faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import getUsername from '../helpers/getUsername';
 import PatchComponent from './PatchComponent.vue';
 
-library.add(faCoins, faPiggyBank);
+library.add(faCoins, faPiggyBank, faStar);
 const props = defineProps(['player', 'backgrounds']);
 const emit = defineEmits(['boardLoaded', 'exchangeTimeForMoney']);
 

@@ -147,10 +147,10 @@ class Game(Resource):
         if game['forcePlayer'] is not None:
             if game['forcePlayer'] != user['username']:
                 return 'Bad request', 400
-
-        opponent = next((u for u in game['players'] if u['username'] != username), None)
-        if user['timeLeft'] < opponent['timeLeft']:
-            return 'Bad request', 400
+        else:
+            opponent = next((u for u in game['players'] if u['username'] != username), None)
+            if user['timeLeft'] < opponent['timeLeft']:
+                return 'Bad request', 400
 
         game['forcePlayer'] = None
         

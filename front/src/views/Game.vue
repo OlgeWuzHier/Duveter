@@ -67,6 +67,7 @@ import getUsername from '../helpers/getUsername';
 const socket = inject('socket');
 const route = useRoute();
 const game = ref();
+window.game = game;
 const mode = ref(localStorage.getItem('mode') || 'light');
 
 let tilePosition = null;
@@ -80,16 +81,17 @@ onMounted(() => {
 
 const isPlayerActive = () => {
   if (game.value.forcePlayer) {
-    if (game.value.forcePlayer === getUsername()) {
-      return true;
+    if (game.value.forcePlayer !== getUsername()) {
+      return false;
+    }
+  } else {
+    const player = game.value.players.filter((p) => p.username === getUsername())[0];
+    const opponent = game.value.players.filter((p) => p.username !== getUsername())[0];
+    if (player.timeLeft < opponent.timeLeft) {
+      return false;
     }
   }
-  const player = game.value.players.filter((p) => p.username === getUsername())[0];
-  const opponent = game.value.players.filter((p) => p.username !== getUsername())[0];
-  if (player.timeLeft > opponent.timeLeft) {
-    return true;
-  }
-  return false;
+  return true;
 };
 
 const overlayStyle = computed(() => ({
@@ -103,6 +105,8 @@ const overlayStyle = computed(() => ({
   opacity: (mode.value === 'light') ? 0.25 : 0.4,
   display: isPlayerActive() ? 'none' : 'block',
 }));
+
+window.overlayStyle = overlayStyle;
 
 const comingupStyle = computed(() => ({
   'border-top': `1px solid ${(mode.value === 'light') ? 'black' : 'white'}`,
@@ -140,13 +144,11 @@ const preparePlayerPatches = () => {
 
 const removePatchRotation = () => {
   availablePatches().forEach((patch) => {
-    console.log(patch);
     const domElem = document.getElementById(patch.name);
-    console.log(domElem);
-    if (domElem.dataset.rotate) {
+    if (domElem.dataset && domElem.dataset.rotate) {
       domElem.dataset.rotate = '0';
     }
-    if (domElem.dataset.flip) {
+    if (domElem.dataset && domElem.dataset.flip) {
       domElem.dataset.flip = '0';
     }
   });
