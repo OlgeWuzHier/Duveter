@@ -75,7 +75,7 @@ button {
 }
 
 .description {
-  color: black;
+  /* color: black; */
   position: absolute;
   box-sizing: border-box;
   width: 100%;

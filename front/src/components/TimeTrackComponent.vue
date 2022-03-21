@@ -1,7 +1,7 @@
 <template>
-  <div class="time-wrapper">
+  <div class="time-wrapper" :style="timeWrapperBorderStyle">
     <div class='time-track'>
-      <div v-for="(timeunit, index) in Array(54).fill(1)"
+      <div :style="timeTrackBorderStyle" v-for="(timeunit, index) in Array(54).fill(1)"
       :key="index"
       data-row="0">
         <font-awesome-icon
@@ -13,7 +13,7 @@
           v-if="props.bonusPatchFields.includes(53 - index)"
           :icon="['fas', 'square']" />
       </div>
-      <div v-for="(timeunit, index) in Array(54).fill(1)"
+      <div :style="timeTrackBorderStyle" v-for="(timeunit, index) in Array(54).fill(1)"
       :key="index"
       data-row="1">
       <font-awesome-icon
@@ -28,15 +28,25 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue';
+import {
+  defineProps, computed, ref, onMounted,
+} from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faPiggyBank, faSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import getUsername from '../helpers/getUsername';
 
+const mode = ref(localStorage.getItem('mode') || 'light');
+
 library.add(faPiggyBank, faSquare);
 const props = defineProps(['players', 'coinFields', 'bonusPatchFields']);
+
+onMounted(() => {
+  window.addEventListener('mode-changed', () => {
+    mode.value = localStorage.getItem('mode');
+  });
+});
 
 const playerPawnStyle = computed(() => ({
   left: `calc(${1 + 2 * (53 - props.players.filter((p) => p.username === getUsername())[0].timeLeft)}*100% / 108)`,
@@ -44,6 +54,15 @@ const playerPawnStyle = computed(() => ({
 
 const opponentPawnStyle = computed(() => ({
   left: `calc(${1 + 2 * (53 - props.players.filter((p) => p.username !== getUsername())[0].timeLeft)}*100% / 108)`,
+}));
+
+const timeTrackBorderStyle = computed(() => ({
+  'border-right': `1px solid ${(mode.value === 'light') ? 'black' : 'white'}`,
+}));
+
+const timeWrapperBorderStyle = computed(() => ({
+  border: `1px solid ${(mode.value === 'light') ? 'black' : 'white'}`,
+  'border-bottom': 'none',
 }));
 
 </script>
@@ -55,7 +74,6 @@ const opponentPawnStyle = computed(() => ({
   height: 100%;
 }
 .time-track {
-  color: black;
   display: grid;
   grid-template-columns: repeat(54, 1fr);
   grid-template-rows: repeat(2, 1fr);
@@ -64,7 +82,6 @@ const opponentPawnStyle = computed(() => ({
   text-align: center;
 }
 .time-track>div {
-  border-right: 1px solid black;
   position: relative;
 }
 .bonus-icon {

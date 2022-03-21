@@ -67,7 +67,7 @@ const buttonStyle = computed(() => ({
 }
 
 .description {
-  color: black;
+  /* color: black; */
   font-size: 1.3em;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="game">
+  <div v-if="game" class="game">
     <div class='element available'>
       <AvailablePatchComponent
       v-for="patch in availablePatches()"
@@ -34,7 +34,7 @@
       :coinFields="game.coinFields"
       :bonusPatchFields="game.bonusPatchFields" />
     </div>
-    <div class='element comingup'>
+    <div class='element comingup' :style="comingupStyle">
       <div class='patches-container'>
         <PatchComponent
         v-for="patch in comingupPatches()"
@@ -45,6 +45,7 @@
         :draggable="false"/>
       </div>
     </div>
+    <div class="overlay" :style="overlayStyle"></div>
   </div>
 </template>
 
@@ -57,16 +58,55 @@ import BoardComponent from '@/components/BoardComponent.vue';
 import TimeTrackComponent from '@/components/TimeTrackComponent.vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
-import { ref, inject } from 'vue';
+import {
+  ref, inject, computed, onMounted,
+} from 'vue';
 import getTilesBackgrounds from '../helpers/getTilesBackgrounds';
 import getUsername from '../helpers/getUsername';
 
 const socket = inject('socket');
 const route = useRoute();
 const game = ref();
+const mode = ref(localStorage.getItem('mode') || 'light');
 
 let tilePosition = null;
 let positionValid = false;
+
+onMounted(() => {
+  window.addEventListener('mode-changed', () => {
+    mode.value = localStorage.getItem('mode');
+  });
+});
+
+const isPlayerActive = () => {
+  if (game.value.forcePlayer) {
+    if (game.value.forcePlayer === getUsername()) {
+      return true;
+    }
+  }
+  const player = game.value.players.filter((p) => p.username === getUsername())[0];
+  const opponent = game.value.players.filter((p) => p.username !== getUsername())[0];
+  if (player.timeLeft > opponent.timeLeft) {
+    return true;
+  }
+  return false;
+};
+
+const overlayStyle = computed(() => ({
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  'z-index': 10000,
+  background: 'black',
+  opacity: (mode.value === 'light') ? 0.25 : 0.4,
+  display: isPlayerActive() ? 'none' : 'block',
+}));
+
+const comingupStyle = computed(() => ({
+  'border-top': `1px solid ${(mode.value === 'light') ? 'black' : 'white'}`,
+}));
 
 const availablePatches = () => {
   if (game.value.patchesList[0].name.includes('special')) {
@@ -291,7 +331,10 @@ const boardLoaded = () => {
     justify-content: stretch;
     align-content: stretch;
     overflow: hidden;
-    color: white;
+  }
+
+  .game {
+    position: relative;
   }
 
   .element {
@@ -321,8 +364,6 @@ const boardLoaded = () => {
 
   .time {
     grid-area: time;
-    border: 1px solid black;
-    border-bottom: none;
   }
 
   .comingup {

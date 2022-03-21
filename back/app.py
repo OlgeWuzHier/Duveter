@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from flask import Flask, request
 from flask_jwt_extended.utils import get_jwt_identity
 from flask_pymongo import PyMongo
-# from PyMongo import MongoClient
 from flask_restful import Resource, Api
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
@@ -94,7 +93,7 @@ class Queue(Resource):
                             "timeLeft": 53,
                         },
                     ],
-                    "forcePlayer": None,
+                    "forcePlayer": player1["username"],
                 })
             
             socketio.emit(f'lobby-{player1["username"]}', json_util.dumps(game.inserted_id))
@@ -103,6 +102,29 @@ class Queue(Resource):
         return 'OK', 200
 
 class Game(Resource):
+    def __add_bonus_patch_if_applicable(self, game, user, time_before):
+        if len(game['bonusPatchFields']):
+            if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
+                game['bonusPatchFields'].pop()
+                game['patchesList'].insert(0, {
+                    "name": f"special{len(game['bonusPatchFields'])}",
+                    "arrangement_table": [[1]],
+                    "price_coins": 0,
+                    "price_time": 0,
+                    "income_value": 0
+                })
+                game['forcePlayer'] = user['username']
+
+    def __add_money_if_applicable(self, game, user, time_before):
+        for coin_field in game['coinFields']:
+            if user['timeLeft'] <= coin_field < time_before:
+                user['coins'] += sum(p['income_value'] for p in user['patches'])
+
+    def __set_force_player_if_applicable(self, game, user):
+        # If both players have the same time left, current makes move again
+        if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
+            game['forcePlayer'] = user['username']
+
     @jwt_required()
     def get(self):
         if not request.args.get("id"):
@@ -116,16 +138,26 @@ class Game(Resource):
             return 'Bad request', 400
 
         username = get_jwt_identity()
-        # TODO: Check if it is this player move
+        game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
+        user = next((u for u in game['players'] if u['username'] == username), None)
+        if user is None:
+            return 'Bad request', 400
+        
+        # Check if it is this player move
+        if game['forcePlayer'] is not None:
+            if game['forcePlayer'] != user['username']:
+                return 'Bad request', 400
+
+        opponent = next((u for u in game['players'] if u['username'] != username), None)
+        if user['timeLeft'] < opponent['timeLeft']:
+            return 'Bad request', 400
+
+        game['forcePlayer'] = None
         
         patch = request.json.get('patch')
         time_balance = request.json.get('timeBalance')
 
         if patch:
-            game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
-            user = next((u for u in game['players'] if u['username'] == username), None)
-            if user is None:
-                return 'Bad request', 400
             original_patch = next((p for p in game['patchesList'] if p['name'] == patch['name']), None)
             if original_patch is None: 
                 return 'Bad request', 400
@@ -168,64 +200,22 @@ class Game(Resource):
             if user['coins'] < 0:
                 return 'Bad request', 400
 
-            # Add money if applicable
-            for coin_field in game['coinFields']:
-                if user['timeLeft'] <= coin_field < time_before:
-                    user['coins'] += sum(p['income_value'] for p in user['patches'])
-
-            # Add bonus patch if applicable
-            if len(game['bonusPatchFields']):
-                if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
-                    game['bonusPatchFields'].pop()
-                    game['patchesList'].insert(0, {
-                        "name": f"special{len(game['bonusPatchFields'])}",
-                        "arrangement_table": [[1]],
-                        "price_coins": 0,
-                        "price_time": 0,
-                        "income_value": 0
-                    })
-                    game['forcePlayer'] = user['username']
-
-            # If both players have the same time left, current makes move again
-            if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
-                game['forcePlayer'] = user['username']
+            self.__add_money_if_applicable(game, user, time_before)
+            self.__add_bonus_patch_if_applicable(game, user, time_before)
+            self.__set_force_player_if_applicable(game, user)
 
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
-            
             return 'OK', 200
 
         elif time_balance:
-            game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
-            user = next((u for u in game['players'] if u['username'] == username), None)
-            if user is None:
-                return 'Bad request', 400
-            
             time_before = user['timeLeft']
             user['timeLeft'] -= time_balance
             user['coins'] += time_balance
 
-            # Add money if applicable
-            for coin_field in game['coinFields']:
-                if user['timeLeft'] <= coin_field < time_before:
-                    user['coins'] += sum(p['income_value'] for p in user['patches'])
-
-            # Add bonus patch if applicable
-            if len(game['bonusPatchFields']):
-                if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
-                    game['bonusPatchFields'].pop()
-                    game['patchesList'].insert(0, {
-                        "name": f"special{len(game['bonusPatchFields'])}",
-                        "arrangement_table": [[1]],
-                        "price_coins": 0,
-                        "price_time": 0,
-                        "income_value": 0
-                    })
-                    game['forcePlayer'] = user['username']
-
-            # If both players have the same time left, current makes move again
-            if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
-                game['forcePlayer'] = user['username']
+            self.__add_money_if_applicable(game, user, time_before)
+            self.__add_bonus_patch_if_applicable(game, user, time_before)
+            self.__set_force_player_if_applicable(game, user)
 
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))

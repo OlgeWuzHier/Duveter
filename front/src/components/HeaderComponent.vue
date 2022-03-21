@@ -4,7 +4,7 @@
       <img src="@/assets/logo.png" alt="Duveter" loading="lazy"/>
     </router-link>
     <nav class="flexitem">
-      <div class="navitem">
+      <div class="navitem" @click="toggleBackground" style="cursor: pointer;">
         <font-awesome-icon :icon="['fas', 'moon']"/>
       </div>
       <router-link class="navitem" to="/">
@@ -13,7 +13,7 @@
       <router-link class="navitem" to="/leaderboard">
         <font-awesome-icon :icon="['fas', 'clipboard-list']" style="padding-right: 10px;"/>
         Leaderboard</router-link>
-      <a class="navitem" v-on:click="logout" v-if="logged">
+      <a class="navitem" @click="logout" v-if="logged" style="cursor: pointer;">
         <font-awesome-icon :icon="['fas', 'power-off']" style="padding-right: 10px;"/>
         Logout
       </a>
@@ -45,6 +45,10 @@ watch(() => route.name, () => {
   logged.value = isAuthenticated();
 });
 
+const toggleBackground = () => {
+  localStorage.setItem('mode', localStorage.getItem('mode') === 'light' ? 'dark' : 'light');
+  window.dispatchEvent(new CustomEvent('mode-changed'));
+};
 </script>
 
 <style scoped>
