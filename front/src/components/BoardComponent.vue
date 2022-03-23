@@ -71,7 +71,6 @@ const buttonStyle = computed(() => ({
 }
 
 .description {
-  /* color: black; */
   font-size: 1.3em;
 }
 
@@ -96,7 +95,6 @@ const buttonStyle = computed(() => ({
 }
 
 .board > .board-elem {
-  /* z-index: 100; */
   border: 1px solid rgba(0, 0, 0, 0.75);
   box-sizing: border-box;
   height: 3vw;

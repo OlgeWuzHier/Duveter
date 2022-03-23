@@ -16,7 +16,7 @@
       :background="props.background"
       class="draggable"
       @identifyTile='identifyTile'/>
-    <div class="description">
+    <div class="description" :style="descriptionStyle">
       <font-awesome-icon :icon="['fas', 'coins']" />:
         {{props.patch.price_coins}}
       <font-awesome-icon :icon="['fas', 'clock-rotate-left']" style="transform: scaleX(-1);"/>:
@@ -29,7 +29,9 @@
 
 <script setup>
 import PatchComponent from '@/components/PatchComponent.vue';
-import { toRefs, defineProps, defineEmits } from 'vue';
+import {
+  toRefs, defineProps, defineEmits, ref, onMounted, computed,
+} from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faRotateRight, faUpDown, faCoins, faPiggyBank, faClockRotateLeft,
@@ -39,6 +41,17 @@ library.add(faRotateRight, faUpDown, faCoins, faPiggyBank, faClockRotateLeft);
 const props = defineProps(['patch', 'draggable', 'background']);
 const emit = defineEmits(['rotate', 'flipHorizontal', 'flipVertical', 'identifyTile']);
 const patch = toRefs(props.patch);
+const mode = ref(localStorage.getItem('mode') || 'light');
+
+onMounted(() => {
+  window.addEventListener('mode-changed', () => {
+    mode.value = localStorage.getItem('mode');
+  });
+});
+
+const descriptionStyle = computed(() => ({
+  filter: `drop-shadow(3px 2px 5px ${(mode.value === 'light') ? 'white' : 'black'})`,
+}));
 
 const rotate = () => emit('rotate', patch.name);
 const flipHorizontal = () => emit('flipHorizontal', patch.name);
@@ -75,7 +88,6 @@ button {
 }
 
 .description {
-  /* color: black; */
   position: absolute;
   box-sizing: border-box;
   width: 100%;

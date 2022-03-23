@@ -67,7 +67,6 @@ import getUsername from '../helpers/getUsername';
 const socket = inject('socket');
 const route = useRoute();
 const game = ref();
-window.game = game;
 const mode = ref(localStorage.getItem('mode') || 'light');
 
 let tilePosition = null;
@@ -105,8 +104,6 @@ const overlayStyle = computed(() => ({
   opacity: (mode.value === 'light') ? 0.25 : 0.4,
   display: isPlayerActive() ? 'none' : 'block',
 }));
-
-window.overlayStyle = overlayStyle;
 
 const comingupStyle = computed(() => ({
   'border-top': `1px solid ${(mode.value === 'light') ? 'black' : 'white'}`,

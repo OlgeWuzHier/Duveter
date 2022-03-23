@@ -1,3 +1,4 @@
+import datetime
 import json
 import re
 from dotenv import load_dotenv
@@ -80,14 +81,12 @@ class Queue(Resource):
                     "players": [
                         {
                             "username": player1["username"],
-                            "score": 0,
                             "patches": [],
                             "coins": 5,
                             "timeLeft": 53,
                         },
                         { 
                             "username": player2["username"],
-                            "score": 0,
                             "patches": [],
                             "coins": 5,
                             "timeLeft": 53,
@@ -125,6 +124,24 @@ class Game(Resource):
         if game['players'][0]['timeLeft'] == game['players'][1]['timeLeft']:
             game['forcePlayer'] = user['username']
 
+    def __end_game_if_applicable(self, game):
+        if game['players'][0]['timeLeft'] <= 0 and game['players'][1]['timeLeft'] <= 0:
+            mongo.db.gameResults.insert_one({
+                'players': [
+                    {
+                    'username': game['players'][0]['username'],
+                    'score': -162 + 2 * sum([i for sub in [i for sub in map(lambda x: x['arrangement_table'], game['players'][0]['patches']) for i in sub] for i in sub]) + game['players'][0]['coins']
+                    }, 
+                    {
+                    'username': game['players'][1]['username'],
+                    'score': -162 + 2 * sum([i for sub in [i for sub in map(lambda x: x['arrangement_table'], game['players'][1]['patches']) for i in sub] for i in sub]) + game['players'][1]['coins']
+                    }
+                ],
+                'date': datetime.datetime.now()
+            })
+
+            mongo.db.games.delete_one({'_id': game['_id']})
+
     @jwt_required()
     def get(self):
         if not request.args.get("id"):
@@ -143,6 +160,10 @@ class Game(Resource):
         if user is None:
             return 'Bad request', 400
         
+        # Check if user has time left
+        if user['timeLeft'] <= 0:
+            return 'Bad request', 400
+
         # Check if it is this player move
         if game['forcePlayer'] is not None:
             if game['forcePlayer'] != user['username']:
@@ -206,6 +227,8 @@ class Game(Resource):
 
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
+
+            self.__end_game_if_applicable(game)
             return 'OK', 200
 
         elif time_balance:
@@ -219,6 +242,8 @@ class Game(Resource):
 
             mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
             socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
+
+            self.__end_game_if_applicable(game)
             return 'OK', 200
         
         return 'Bad request', 400
@@ -231,4 +256,4 @@ api.add_resource(Game, '/game')
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0')
