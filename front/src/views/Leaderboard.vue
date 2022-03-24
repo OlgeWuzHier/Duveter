@@ -7,7 +7,7 @@
       class="result-wrapper"
       :class="modeClass">
         <div class="number">{{index + 1}}.</div>
-        <div class="nick" :class="(result.username === userName) ? 'color-green' : ''">
+        <div class="nick" :class="(result.username === username) ? 'color-green' : ''">
           {{result.username}}
         </div>
         <div class="score">{{result.score}}</div>
@@ -24,7 +24,7 @@ import getUsername from '../helpers/getUsername';
 
 const results = ref();
 const mode = ref(localStorage.getItem('mode') || 'light');
-const userName = getUsername();
+const username = getUsername();
 
 onMounted(() => {
   window.addEventListener('mode-changed', () => {
@@ -94,6 +94,7 @@ h1.dark {
 }
 
 .color-green {
-  color: green;
+  color: #6ab04c;
+  text-shadow: 1px 1px 1px black;
 }
 </style>

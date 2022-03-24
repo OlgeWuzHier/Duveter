@@ -108,7 +108,7 @@ class Game(Resource):
                 game['patchesList'].insert(0, {
                     "name": f"special{len(game['bonusPatchFields'])}",
                     "arrangement_table": [[1]],
-                    "price_coins": 0,
+                    "price_coins": 0, # TODO: Unify casing
                     "price_time": 0,
                     "income_value": 0
                 })
@@ -145,7 +145,9 @@ class Game(Resource):
     @jwt_required()
     def get(self):
         if not request.args.get("id"):
-            return 'Bad request', 400
+            username = get_jwt_identity()
+            games = mongo.db.games.find({ "players.username": username })
+            return { "games": json.loads(json_util.dumps(games)) }
         game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
         return { "game": json.loads(json_util.dumps(game)) }
 
@@ -161,6 +163,7 @@ class Game(Resource):
             return 'Bad request', 400
         
         # Check if user has time left
+        # TODO: Fix bug - its not possible to plant bonus tile if timeLeft < 0
         if user['timeLeft'] <= 0:
             return 'Bad request', 400
 
