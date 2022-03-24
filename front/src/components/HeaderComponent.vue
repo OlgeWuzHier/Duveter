@@ -93,4 +93,24 @@ img {
   height: 80px;
   object-fit: contain;
 }
+
+@media screen and (max-width: 2000px) {
+  header {
+    height: 60px;
+  }
+
+  .navitem {
+    line-height: 60px;
+  }
+
+  img {
+    height: 60px;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .flexitem {
+    flex-basis: 50%;
+  }
+}
 </style>

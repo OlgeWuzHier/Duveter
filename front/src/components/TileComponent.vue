@@ -16,7 +16,8 @@ const emit = defineEmits(['identifyTile']);
 const style = computed(() => ({
   opacity: props.visible ? '1' : '0',
   'background-image': `url(${require(`../assets/${props.background}.jpg`)})`,
-  'background-position': `${-3 * props.xIndex}vw ${-3 * props.yIndex}vw `,
+  'background-position': `calc(${-1 * props.xIndex} * var(--base-tile-size))
+    calc(${-1 * props.yIndex} * var(--base-tile-size)) `,
 }));
 
 const identify = () => emit('identifyTile', { x: props.xIndex, y: props.yIndex });

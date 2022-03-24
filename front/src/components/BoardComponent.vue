@@ -89,16 +89,16 @@ const buttonStyle = computed(() => ({
   position: relative;
   border-radius: 20px;
   display: grid;
-  grid-template-columns: repeat(9, 3vw);
-  grid-template-rows: repeat(9, 3vw);
+  grid-template-columns: repeat(9, var(--base-tile-size));
+  grid-template-rows: repeat(9, var(--base-tile-size));
   box-sizing: border-box;
 }
 
 .board > .board-elem {
   border: 1px solid rgba(0, 0, 0, 0.75);
   box-sizing: border-box;
-  height: 3vw;
-  width: 3vw;
+  height: var(--base-tile-size);
+  width: var(--base-tile-size);
 }
 
 .board .wrapper {

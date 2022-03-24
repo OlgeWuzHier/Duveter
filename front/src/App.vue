@@ -30,6 +30,16 @@ const style = computed(() => ({
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
 
+:root {
+  --base-tile-size: 3vw;
+}
+
+@media screen and (max-width: 2000px) {
+  :root {
+    --base-tile-size: 2.3vw;
+  }
+}
+
 #app {
   font-family: 'Patrick Hand', Roboto, Helvetica, Arial, sans-serif;
   text-align: center;

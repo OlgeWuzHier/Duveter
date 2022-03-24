@@ -22,11 +22,11 @@ const emit = defineEmits(['identifyTile']);
 const rows = computed(() => props.patch.arrangement_table[0].length);
 
 const style = computed(() => ({
-  'grid-template-columns': `repeat(${props.patch.arrangement_table[0].length}, 3vw)`,
-  'grid-template-rows': `repeat(${props.patch.arrangement_table.length}, 3vw)`,
+  'grid-template-columns': `repeat(${props.patch.arrangement_table[0].length}, var(--base-tile-size))`,
+  'grid-template-rows': `repeat(${props.patch.arrangement_table.length}, var(--base-tile-size))`,
   position: props.draggable ? 'absolute' : 'static',
-  left: props.patch.position ? `${props.patch.position.x * 3}vw` : 'initial',
-  top: props.patch.position ? `${props.patch.position.y * 3}vw` : 'initial',
+  left: props.patch.position ? `calc(${props.patch.position.x} * var(--base-tile-size))` : 'initial',
+  top: props.patch.position ? `calc(${props.patch.position.y} * var(--base-tile-size))` : 'initial',
 }));
 
 const identifyTile = (obj) => emit('identifyTile', obj);

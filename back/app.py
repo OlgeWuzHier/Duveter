@@ -248,11 +248,26 @@ class Game(Resource):
         
         return 'Bad request', 400
 
+class Leaderboards(Resource):
+    @jwt_required()
+    def get(self):
+        results = json.loads(json_util.dumps(mongo.db.gameResults.find()))
+        scores = []
+        for game in results:
+            for player in game['players']:
+                scores.append({
+                    'username': player['username'],
+                    'score': player['score'],
+                    'date': game['date']
+                    })
+        scores.sort(reverse=True, key=lambda x: x['score'])
+        return scores[:10]
 
 api.add_resource(Login, '/login')
 api.add_resource(Register, '/register')
 api.add_resource(Queue, '/queue')
 api.add_resource(Game, '/game')
+api.add_resource(Leaderboards, '/leaderboards')
 
 
 if __name__ == '__main__':
