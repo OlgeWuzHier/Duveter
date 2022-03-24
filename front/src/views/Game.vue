@@ -45,7 +45,9 @@
         :draggable="false"/>
       </div>
     </div>
-    <div class="overlay" :style="overlayStyle"></div>
+    <div class="overlay" :style="overlayStyle">
+      <font-awesome-icon :icon="['fas', 'hourglass-empty']" id="hourglass" />
+      Waiting for opponent's move...</div>
   </div>
 </template>
 
@@ -61,6 +63,8 @@ import { useRoute } from 'vue-router';
 import {
   ref, inject, computed, onMounted,
 } from 'vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHourglassEmpty } from '@fortawesome/free-solid-svg-icons';
 import getTilesBackgrounds from '../helpers/getTilesBackgrounds';
 import getUsername from '../helpers/getUsername';
 
@@ -71,6 +75,8 @@ const mode = ref(localStorage.getItem('mode') || 'light');
 
 let tilePosition = null;
 let positionValid = false;
+
+library.add(faHourglassEmpty);
 
 onMounted(() => {
   window.addEventListener('mode-changed', () => {
@@ -101,7 +107,7 @@ const overlayStyle = computed(() => ({
   right: 0,
   'z-index': 10000,
   background: 'black',
-  opacity: (mode.value === 'light') ? 0.25 : 0.4,
+  opacity: 0.5,
   display: isPlayerActive() ? 'none' : 'block',
 }));
 
@@ -276,6 +282,7 @@ const boardLoaded = () => {
     .dropzone({
       ondrop(event) {
         const patch = game.value.patchesList.filter((p) => p.name === event.relatedTarget.id)[0];
+        const player = game.value.players.filter((p) => p.username === getUsername())[0];
         const width = patch.arrangement_table[0].length;
         const height = patch.arrangement_table.length;
         const dropPosition = {
@@ -288,7 +295,7 @@ const boardLoaded = () => {
           patch.arrangement_table, dropPosition,
         );
         const patchCollides = !!boardArrangementTable.flat().filter((x) => x > 1).length;
-        const canAfford = true; // TODO: Check if user has resources
+        const canAfford = player.coins >= patch.price_coins;
 
         console.log(`${event.relatedTarget.id} was dropped into`, dropPosition);
 
@@ -383,13 +390,22 @@ const boardLoaded = () => {
     flex-shrink: 0;
   }
 
-  .element-b {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
+  .overlay {
+    font-size: 3em;
+    padding-top: calc(50vh - 80px - 1.5em);
+    color: white;
   }
 
-  .element-c {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
+  #hourglass {
+    margin-right: 15px;
+    animation: rotation 2s infinite ease;
   }
+
+  @keyframes rotation {
+    0% { transform: rotate(0);}
+    20% {transform: rotate(-10deg);}
+    70% {transform: rotate(180deg);}
+    100% {transform: rotate(180deg);}
+  }
+
 </style>
