@@ -2,7 +2,8 @@
   <div class='main'>
     <div>
       <h2>Start new game:</h2>
-      <button @click='startGame' class='startgame-button ripple'>Play with random!</button>
+      <button @click='startGame(false)' class='startgame-button ripple'>Play with random!</button>
+      <button @click='startGame(true)' class='startgame-button ripple'>Play with AI!</button>
     </div>
     <div v-if="activeGames" class="active-games">
       <h2>Active games:</h2>
@@ -72,7 +73,7 @@ axios.get('/game')
     }));
   });
 
-const startGame = () => {
+const startGame = (vsAI) => {
   // socket.removeAllListeners();
   // Listen for socket notification about created game
   socket.on(`lobby-${username}`, (data) => {
@@ -80,7 +81,7 @@ const startGame = () => {
     router.push({ name: 'Game', params: { id } });
   });
   // Join queue
-  axios.post('/queue')
+  axios.post('/queue', { vsAI })
     .then((resp) => {
       // TODO: show waiting for other player on page
       console.log(resp);

@@ -14,6 +14,7 @@ from bson.objectid import ObjectId
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import bcrypt
 import random
+from duveterAI import DuveterAI
 
 load_dotenv()
 
@@ -62,12 +63,15 @@ class Queue(Resource):
     @jwt_required()
     def post(self):
         username = get_jwt_identity()
+        gameVsAI = request.json.get('vsAI') or False
         # TODO: Check if user is already in queue
-        mongo.db.queue.insert_one({ 'username': username })
+        if not gameVsAI:
+            mongo.db.queue.insert_one({ 'username': username })
 
-        if mongo.db.queue.count_documents({}) > 1:
-            player1 = mongo.db.queue.find_one_and_delete({ 'username': username })
-            player2 = mongo.db.queue.find_one_and_delete({})
+        if mongo.db.queue.count_documents({}) > 1 or gameVsAI:
+            if not gameVsAI:
+                player1 = mongo.db.queue.find_one_and_delete({ 'username': username })
+                player2 = mongo.db.queue.find_one_and_delete({})
             
             with open("patches.json", 'r') as j:
                 patches = json.loads(j.read())
@@ -80,27 +84,36 @@ class Queue(Resource):
                     "bonusPatchFields": [3, 9, 15, 21, 27], 
                     "players": [
                         {
-                            "username": player1["username"],
+                            "username": username,
                             "patches": [],
                             "coins": 5,
                             "timeLeft": 53,
                         },
                         { 
-                            "username": player2["username"],
+                            "username": player2["username"] if not gameVsAI else DuveterAI.USERNAME,
                             "patches": [],
                             "coins": 5,
                             "timeLeft": 53,
                         },
                     ],
-                    "forcePlayer": player1["username"],
+                    "forcePlayer": username,
+                    "vsAI": gameVsAI, 
                 })
             
-            socketio.emit(f'lobby-{player1["username"]}', json_util.dumps(game.inserted_id))
-            socketio.emit(f'lobby-{player2["username"]}', json_util.dumps(game.inserted_id))
+            socketio.emit(f'lobby-{username}', json_util.dumps(game.inserted_id))
+            if not gameVsAI:
+                socketio.emit(f'lobby-{player2["username"]}', json_util.dumps(game.inserted_id))
 
         return 'OK', 200
 
 class Game(Resource):
+    def __get_active_player(self, game):
+        if game['forcePlayer'] is not None:
+            return game['forcePlayer']
+        if game['players'][0]['timeLeft'] > game['players'][1]['timeLeft']:
+            return game['players'][0]['username']
+        return game['players'][1]['username']
+
     def __add_bonus_patch_if_applicable(self, game, user, time_before):
         if len(game['bonusPatchFields']):
             if user['timeLeft'] <= game['bonusPatchFields'][-1] < time_before:
@@ -142,6 +155,24 @@ class Game(Resource):
 
             mongo.db.games.delete_one({'_id': game['_id']})
 
+    def __save_game_and_emit(self, game):
+        mongo.db.games.replace_one({ "_id": game["_id"] }, game)
+        socketio.emit(str(game["_id"]), json.loads(json_util.dumps(game)))
+
+    def __trigger_ai_move_if_applicable(self, game):
+        if game["vsAI"]:
+            ai_player = next((u for u in game['players'] if u['username'] == DuveterAI.USERNAME), None)
+
+            while self.__get_active_player(game) == DuveterAI.USERNAME:
+                game['forcePlayer'] = None
+                time_before = ai_player['timeLeft']
+                DuveterAI.make_move(game)
+                self.__add_money_if_applicable(game, ai_player, time_before)
+                self.__add_bonus_patch_if_applicable(game, ai_player, time_before)
+                self.__set_force_player_if_applicable(game, ai_player)
+            
+            self.__save_game_and_emit(game)
+
     @jwt_required()
     def get(self):
         if not request.args.get("id"):
@@ -158,23 +189,20 @@ class Game(Resource):
 
         username = get_jwt_identity()
         game = mongo.db.games.find_one({ "_id": ObjectId(request.args.get('id')) })
+
+        if game is None:
+            return 'Bad request', 400
+
         user = next((u for u in game['players'] if u['username'] == username), None)
         if user is None:
             return 'Bad request', 400
         
-        # Check if user has time left
-        # TODO: Fix bug - its not possible to plant bonus tile if timeLeft < 0
-        if user['timeLeft'] <= 0:
+        # Check if user has time left, allow if special patch is available
+        if user['timeLeft'] <= 0 and 'special' not in game['patchesList'][0]['name']:
             return 'Bad request', 400
 
-        # Check if it is this player move
-        if game['forcePlayer'] is not None:
-            if game['forcePlayer'] != user['username']:
-                return 'Bad request', 400
-        else:
-            opponent = next((u for u in game['players'] if u['username'] != username), None)
-            if user['timeLeft'] < opponent['timeLeft']:
-                return 'Bad request', 400
+        if self.__get_active_player(game) != username:
+            return 'Bad request', 400
 
         game['forcePlayer'] = None
         
@@ -227,14 +255,16 @@ class Game(Resource):
             self.__add_money_if_applicable(game, user, time_before)
             self.__add_bonus_patch_if_applicable(game, user, time_before)
             self.__set_force_player_if_applicable(game, user)
-
-            mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
-            socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
-
+            self.__save_game_and_emit(game)
+            self.__trigger_ai_move_if_applicable(game)
             self.__end_game_if_applicable(game)
             return 'OK', 200
 
         elif time_balance:
+            # Force player to pick bonus patch if available
+            if 'special' in game['patchesList'][0]['name']:
+                return 'Bad request', 400
+
             time_before = user['timeLeft']
             user['timeLeft'] -= time_balance
             user['coins'] += time_balance
@@ -242,10 +272,8 @@ class Game(Resource):
             self.__add_money_if_applicable(game, user, time_before)
             self.__add_bonus_patch_if_applicable(game, user, time_before)
             self.__set_force_player_if_applicable(game, user)
-
-            mongo.db.games.replace_one({ "_id": ObjectId(request.args.get('id')) }, game)
-            socketio.emit(request.args.get('id'), json.loads(json_util.dumps(game)))
-
+            self.__save_game_and_emit(game)
+            self.__trigger_ai_move_if_applicable(game)
             self.__end_game_if_applicable(game)
             return 'OK', 200
         
