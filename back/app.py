@@ -164,12 +164,15 @@ class Game(Resource):
             ai_player = next((u for u in game['players'] if u['username'] == DuveterAI.USERNAME), None)
 
             while self.__get_active_player(game) == DuveterAI.USERNAME:
+                if ai_player['timeLeft'] <= 0:
+                    break
                 game['forcePlayer'] = None
                 time_before = ai_player['timeLeft']
                 DuveterAI.make_move(game)
                 self.__add_money_if_applicable(game, ai_player, time_before)
                 self.__add_bonus_patch_if_applicable(game, ai_player, time_before)
                 self.__set_force_player_if_applicable(game, ai_player)
+                self.__end_game_if_applicable(game)
             
             self.__save_game_and_emit(game)
 
