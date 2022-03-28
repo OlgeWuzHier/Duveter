@@ -46,7 +46,7 @@ class DuveterAI():
         return arrangement_table
 
     @staticmethod
-    def __get_best_placement_for_patches(patches, arrangement_table):
+    def __get_best_placement_for_patches(patches, arrangement_table, C3, C4):
         patches_with_placements = []
         for patch in patches:
             possible_placements = []
@@ -78,22 +78,26 @@ class DuveterAI():
                                     'y': y,
                                     'rotate': rotate,
                                     'flip': flip,
-                                    'score': score,
-                                    'score2': score2
+                                    'score': score * C3 + score2 * C4,
                                 })
             if len(possible_placements):
                 max_score = max(possible_placements, key=itemgetter('score'))['score']
                 items_with_max_score = [obj for obj in possible_placements if obj['score'] == max_score]
-                max_score2 = max(items_with_max_score, key=itemgetter('score2'))['score2']
-                items_with_max_score2 = [obj for obj in items_with_max_score if obj['score2'] == max_score2]
                 patches_with_placements.append({
-                    'placement': random.choice(items_with_max_score2),
+                    'placement': random.choice(items_with_max_score),
                     'patch': patch
                 })
         return patches_with_placements
 
     @staticmethod
     def make_move(game):
+        (C1, C2, C3, C4) = random.choice([
+            (1.0087890625, -0.517578125, 0.923828125, -0.1875),
+            (1.6142578125, 0.09765625, 0.19921875, 0.251953125),
+            (1.599609375, 0.7626953125, 1.4609375, -0.97265625),
+            (2.6884765625, 0.3525390625, 1.609375, 1.3828125),
+            (0.994140625, 0.583984375, 0.7216796875, -0.40625)
+        ])
         player = game['players'][0]
         ai_player = game['players'][1]
         
@@ -111,7 +115,7 @@ class DuveterAI():
         affordable_patches = [p for p in available_patches if p['price_coins'] <= available_coins[-1]]
 
         arrangement_table = DuveterAI.__get_arrangement_table_for_placement(ai_player)
-        patches_with_placements = DuveterAI.__get_best_placement_for_patches(affordable_patches, arrangement_table)
+        patches_with_placements = DuveterAI.__get_best_placement_for_patches(affordable_patches, arrangement_table, C3, C4)
 
         # Buy patch if any can be afforded and can fit
         if (len(patches_with_placements)):
@@ -119,15 +123,19 @@ class DuveterAI():
             needed_draws = lambda p: available_coins.index(next((c for c in available_coins if c >= p['price_coins'])))
             patch_size   = lambda p: sum([p for sub in p['arrangement_table'] for p in sub])
             time_needed  = lambda p: (p['price_time'] + needed_draws(p)) or 0.01 # Avoid division by zero when bonus patch is found 
-            patch_value  = lambda p: (patch_size(p) * 2 + remaining_incomes * p['income_value'] - p['price_coins'])/time_needed(p)
+            real_patch_value = lambda p: (patch_size(p) * 2 + remaining_incomes * p['income_value'] - p['price_coins'])/time_needed(p)
+            patch_value  = lambda p: C1 * p['real_patch_value'] + C2 * p['patch_size'] + p['placement']['score']
 
             valued_patches = [{
                 'placement': p['placement'],
-                'patch_value': patch_value(p['patch']),
+                'real_patch_value': real_patch_value(p['patch']),
                 'patch_size': patch_size(p['patch']),
                 'needed_draws': needed_draws(p['patch']),
                 'patch': p['patch']
             } for p in patches_with_placements]
+
+            for p in valued_patches:
+                p['patch_value'] = patch_value(p)
 
             best_patch = max(valued_patches, key=itemgetter('patch_value'))
             if best_patch['patch_value'] < 1:
