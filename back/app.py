@@ -2,7 +2,7 @@ import datetime
 import json
 import re
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, make_response, request
 from flask_jwt_extended.utils import get_jwt_identity
 from flask_pymongo import PyMongo
 from flask_restful import Resource, Api
@@ -14,6 +14,7 @@ from bson.objectid import ObjectId
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 import bcrypt
 import random
+import logging
 from duveterAI import DuveterAI
 
 load_dotenv()
@@ -29,6 +30,12 @@ api = Api(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
 
+# Tell that response cannot be cached unless endpoint explicitly says so
+@api.representation('application/json')
+def output_json(data, code, headers=None):
+    resp = make_response(json.dumps(data), code)
+    resp.headers.extend(headers or { 'Cache-Control': 'no-store'})
+    return resp
 
 class Login(Resource):
     def post(self):
@@ -104,6 +111,12 @@ class Queue(Resource):
             if not gameVsAI:
                 socketio.emit(f'lobby-{player2["username"]}', json_util.dumps(game.inserted_id))
 
+        return 'OK', 200
+
+    @jwt_required()
+    def delete(self):
+        username = get_jwt_identity()
+        mongo.db.queue.find_one_and_delete({ 'username': username})
         return 'OK', 200
 
 class Game(Resource):
@@ -302,7 +315,6 @@ api.add_resource(Register, '/register')
 api.add_resource(Queue, '/queue')
 api.add_resource(Game, '/game')
 api.add_resource(Leaderboards, '/leaderboards')
-
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0')

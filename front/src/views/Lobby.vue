@@ -93,7 +93,7 @@ const startGame = (vsAI) => {
 };
 
 const leaveQueue = () => {
-  // TODO: Leave queue when page changed/exited
+  axios.delete('/queue');
   window.removeEventListener('beforeunload', leaveQueue);
   socket.off(`lobby-${username}`);
 };
