@@ -105,6 +105,7 @@ class Queue(Resource):
                     ],
                     "forcePlayer": username,
                     "vsAI": gameVsAI, 
+                    "aiType": random.randint(0, 5) if gameVsAI else None
                 })
             
             socketio.emit(f'lobby-{username}', json_util.dumps(game.inserted_id))
