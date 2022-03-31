@@ -200,8 +200,8 @@ def target_function(genome):
         if game['player']['timeLeft'] == 0:
             break
         result = requests.put(f"http://127.0.0.1:5000/training-game?id={id}", json={ 'timeBalance': game['player']['timeLeft'] })
-        if result.status_code == 400:
-            print(result.text)
+        # if result.status_code == 400:
+        #     print(result.text)
         game = result.json()['game']
 
     score = -162 + 2 * sum([i for sub in [i for sub in map(lambda x: x['arrangement_table'], game['player']['patches']) for i in sub] for i in sub]) + game['player']['coins']

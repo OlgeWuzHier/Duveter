@@ -223,7 +223,6 @@ const getBoardArrangementTable = (newPatchArrangementTable, dropPosition) => {
   [tempPatch, ...player.patches].forEach((patch) => {
     const [x, y] = [patch.position.x, patch.position.y];
     const [width, height] = [patch.arrangement_table[0].length, patch.arrangement_table.length];
-    console.log(x, y, width, height);
     for (let i = 0; i < width; i += 1) {
       for (let j = 0; j < height; j += 1) {
         arrangementTable[j + y][i + x] += patch.arrangement_table[j][i];
@@ -297,8 +296,6 @@ const boardLoaded = () => {
         const patchCollides = !!boardArrangementTable.flat().filter((x) => x > 1).length;
         const canAfford = player.coins >= patch.price_coins;
 
-        console.log(`${event.relatedTarget.id} was dropped into`, dropPosition);
-
         if (patchFits && !patchCollides && canAfford) {
           positionValid = true;
           axios.put(`/game?id=${route.params.id}`, {
@@ -313,7 +310,6 @@ const boardLoaded = () => {
             relatedTarget.style.transform = 'translate(0px, 0px) translateX(-50%)';
             relatedTarget.setAttribute('data-x', 0);
             relatedTarget.setAttribute('data-y', 0);
-            console.log(err);
           });
         }
       },
