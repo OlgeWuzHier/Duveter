@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: back
+    image: ghcr.io/olgewuzhier/duveter/back  
+    build:
+      context: back
+      dockerfile: Dockerfile
+    ports:
+    - 5000:5000
+  frontend:
+    container_name: front
+    image: ghcr.io/olgewuzhier/duveter/front
+    build:
+      context: front
+      dockerfile: Dockerfile
+    ports:
+    - 8080:80

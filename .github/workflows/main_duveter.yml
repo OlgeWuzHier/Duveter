@@ -1,0 +1,46 @@
+name: Build and publish to github packages
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout 
+      uses: actions/checkout@v2
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+    - name: Build image
+      run: docker compose build
+
+    - name: Publish image
+      run: docker compose push
+
+    # - name: Call frontend image webhook
+    #   run: curl ${{ secrets.FRONT_AZURE_WEBHOOK }} -H "" -d ""
+
+    # - name: Call backend image webhook
+    #   run: curl ${{ secrets.BACK_AZURE_WEBHOOK }} -H "" -d ""
