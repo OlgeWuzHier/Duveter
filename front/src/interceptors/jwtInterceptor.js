@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 export default function jwtInterceptor() {
-  axios.defaults.baseURL = 'http://127.0.0.1:5000';
+  axios.defaults.baseURL = 'https://duveter-back.azurewebsites.net';
 
   axios.interceptors.request.use((request) => {
     if (localStorage.accessToken) {

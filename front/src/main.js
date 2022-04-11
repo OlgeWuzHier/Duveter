@@ -9,7 +9,7 @@ import jwtInterceptor from './interceptors/jwtInterceptor';
 jwtInterceptor();
 
 createApp(App)
-  .provide('socket', io('http://localhost:5000'))
+  .provide('socket', io('https://duveter-back.azurewebsites.net'))
   .use(router)
   .component('font-awesome-icon', FontAwesomeIcon)
   .mount('#app');
