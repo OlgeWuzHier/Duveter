@@ -71,7 +71,10 @@ class Queue(Resource):
     def post(self):
         username = get_jwt_identity()
         gameVsAI = request.json.get('vsAI') or False
-        # TODO: Check if user is already in queue
+        
+        if mongo.db.queue.find_one({ 'username': username }):
+            return "User already in queue", 403
+        
         if not gameVsAI:
             mongo.db.queue.insert_one({ 'username': username })
 
