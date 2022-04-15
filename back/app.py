@@ -175,7 +175,7 @@ class Game(Resource):
     def __save_game_and_emit(self, game):
         if mongo.db.games.find_one({ "_id": game["_id"] }):
             mongo.db.games.replace_one({ "_id": game["_id"] }, game)
-            socketio.emit(str(game["_id"]), json.loads(json_util.dumps(game)))
+        socketio.emit(str(game["_id"]), json.loads(json_util.dumps(game)))
 
     def __trigger_ai_move_if_applicable(self, game):
         if game["vsAI"]:
