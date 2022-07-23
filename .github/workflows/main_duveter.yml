@@ -38,11 +38,10 @@ jobs:
       uses: uraimo/run-on-arch-action@v2
       with: 
         arch: aarch64
-        distro: ubuntu_latest
+        distro: archarm_latest
         install: |
-          apt-get update -qy
-          apt-get upgrade -qy
-          apt-get install docker-ce docker-ce-cli containerd.io -qy
+          pacman -Syu --noconfirm
+          pacman -S docker docker-compose
         run: docker compose build
 
     - name: Publish image
