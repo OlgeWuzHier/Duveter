@@ -41,7 +41,7 @@ jobs:
         distro: archarm_latest
         install: |
           pacman -Syu --noconfirm
-          pacman -S docker docker-compose
+          pacman -S docker docker-compose --noconfirm
         run: docker compose build
 
     - name: Publish image
