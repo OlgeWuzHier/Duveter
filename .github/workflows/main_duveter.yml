@@ -20,13 +20,6 @@ jobs:
     - name: Checkout 
       uses: actions/checkout@v2
 
-    - name: Log in to the Container registry
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v3
@@ -43,6 +36,7 @@ jobs:
           pacman -Syu --noconfirm
           pacman -S docker docker-compose --noconfirm
         run: |
+          docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
           docker compose build
           docker compose push
 
