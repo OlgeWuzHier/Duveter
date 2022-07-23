@@ -34,7 +34,7 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
 
-    - name: Build image
+    - name: Build and publish image
       uses: uraimo/run-on-arch-action@v2
       with: 
         arch: aarch64
@@ -42,10 +42,9 @@ jobs:
         install: |
           pacman -Syu --noconfirm
           pacman -S docker docker-compose --noconfirm
-        run: docker compose build
-
-    - name: Publish image
-      run: docker compose push
+        run: |
+          docker compose build
+          docker compose push
 
     - name: Call frontend image webhook
       run: curl ${{ secrets.FRONT_AZURE_WEBHOOK }} -H "" -d ""
