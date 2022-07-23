@@ -45,6 +45,7 @@ jobs:
         context: ./back
         platforms: linux/arm64
         push: true
+        tags: ${{ steps.meta.outputs.tags }}
         
     - name: Build frontend and push
       uses: docker/build-push-action@v3
@@ -52,3 +53,4 @@ jobs:
         context: ./front
         platforms: linux/arm64
         push: true
+        tags: ${{ steps.meta.outputs.tags }}
