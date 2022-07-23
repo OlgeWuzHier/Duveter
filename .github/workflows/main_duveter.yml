@@ -25,12 +25,14 @@ jobs:
       uses: docker/metadata-action@v3
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/back
+        tags: type=raw,value=latest,enable={{is_default_branch}}
 
     - name: Extract metadata (tags, labels) for Docker (frontend image)
       id: meta_front
       uses: docker/metadata-action@v3
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/front
+        tags: type=raw,value=latest,enable={{is_default_branch}}
         
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
