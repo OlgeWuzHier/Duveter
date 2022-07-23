@@ -40,9 +40,9 @@ jobs:
         arch: aarch64
         distro: ubuntu_latest
         install: |
-          apt-get update
-          apt-get upgrade
-          apt-get install docker-ce docker-ce-cli containerd.io
+          apt-get update -qy
+          apt-get upgrade -qy
+          apt-get install docker-ce docker-ce-cli containerd.io -qy
         run: docker compose build
 
     - name: Publish image
