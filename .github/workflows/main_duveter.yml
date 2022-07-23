@@ -20,11 +20,17 @@ jobs:
     - name: Checkout 
       uses: actions/checkout@v2
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
+    - name: Extract metadata (tags, labels) for Docker (backend image)
+      id: meta_back
       uses: docker/metadata-action@v3
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/back
+
+    - name: Extract metadata (tags, labels) for Docker (frontend image)
+      id: meta_front
+      uses: docker/metadata-action@v3
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/front
         
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -45,7 +51,7 @@ jobs:
         context: ./back
         platforms: linux/arm64
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ steps.meta_back.outputs.tags }}
         
     - name: Build frontend and push
       uses: docker/build-push-action@v3
@@ -53,4 +59,4 @@ jobs:
         context: ./front
         platforms: linux/arm64
         push: true
-        tags: ${{ steps.meta.outputs.tags }}
+        tags: ${{ steps.meta_front.outputs.tags }}
