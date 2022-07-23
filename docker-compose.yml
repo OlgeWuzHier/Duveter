@@ -6,6 +6,7 @@ services:
     image: ghcr.io/olgewuzhier/duveter/back  
     build:
       context: back
+      platform: linux/arm64/v8
       dockerfile: Dockerfile
     ports:
     - 5000:5000
@@ -14,6 +15,7 @@ services:
     image: ghcr.io/olgewuzhier/duveter/front
     build:
       context: front
+      platform: linux/arm64/v8
       dockerfile: Dockerfile
     ports:
     - 8080:80
