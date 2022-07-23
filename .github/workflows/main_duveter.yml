@@ -33,8 +33,12 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+    - uses: uraimo/run-on-arch-action@v2
     - name: Build image
-      run: docker compose build
+      with: 
+        arch: aarch64
+        distro: ubuntu_latest
+        run: docker compose build
 
     - name: Publish image
       run: docker compose push
